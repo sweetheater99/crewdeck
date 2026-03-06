@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCompany } from "../context/CompanyContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { companiesApi } from "../api/companies";
-import { accessApi } from "../api/access";
 import { queryKeys } from "../lib/queryKeys";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
@@ -27,9 +26,6 @@ export function CompanySettings() {
     setDescription(selectedCompany.description ?? "");
     setBrandColor(selectedCompany.brandColor ?? "");
   }, [selectedCompany]);
-
-  const [inviteLink, setInviteLink] = useState<string | null>(null);
-  const [inviteError, setInviteError] = useState<string | null>(null);
 
   const generalDirty =
     !!selectedCompany &&
@@ -55,25 +51,6 @@ export function CompanySettings() {
     },
   });
 
-  const inviteMutation = useMutation({
-    mutationFn: () =>
-      accessApi.createCompanyInvite(selectedCompanyId!, {
-        allowedJoinTypes: "both",
-        expiresInHours: 72,
-      }),
-    onSuccess: (invite) => {
-      setInviteError(null);
-      const base = window.location.origin.replace(/\/+$/, "");
-      const absoluteUrl = invite.inviteUrl.startsWith("http")
-        ? invite.inviteUrl
-        : `${base}${invite.inviteUrl}`;
-      setInviteLink(absoluteUrl);
-      queryClient.invalidateQueries({ queryKey: queryKeys.sidebarBadges(selectedCompanyId!) });
-    },
-    onError: (err) => {
-      setInviteError(err instanceof Error ? err.message : "Failed to create invite");
-    },
-  });
   const archiveMutation = useMutation({
     mutationFn: ({
       companyId,
@@ -234,42 +211,6 @@ export function CompanySettings() {
             checked={!!selectedCompany.requireBoardApprovalForNewAgents}
             onChange={(v) => settingsMutation.mutate(v)}
           />
-        </div>
-      </div>
-
-      {/* Invites */}
-      <div className="space-y-4">
-        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Invites
-        </div>
-        <div className="space-y-3 rounded-md border border-border px-4 py-4">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">Generate a link to invite humans or agents to this project.</span>
-            <HintIcon text="Invite links expire after 72 hours and allow both human and agent joins." />
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button size="sm" onClick={() => inviteMutation.mutate()} disabled={inviteMutation.isPending}>
-              {inviteMutation.isPending ? "Creating..." : "Create invite link"}
-            </Button>
-            {inviteLink && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={async () => {
-                  await navigator.clipboard.writeText(inviteLink);
-                }}
-              >
-                Copy link
-              </Button>
-            )}
-          </div>
-          {inviteError && <p className="text-sm text-destructive">{inviteError}</p>}
-          {inviteLink && (
-            <div className="rounded-md border border-border bg-muted/30 p-2">
-              <div className="text-xs text-muted-foreground">Share link</div>
-              <div className="mt-1 break-all font-mono text-xs">{inviteLink}</div>
-            </div>
-          )}
         </div>
       </div>
 

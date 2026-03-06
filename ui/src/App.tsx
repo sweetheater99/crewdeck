@@ -25,28 +25,9 @@ import { CompanySettings } from "./pages/CompanySettings";
 import { DesignGuide } from "./pages/DesignGuide";
 import { OrgChart } from "./pages/OrgChart";
 import { AuthPage } from "./pages/Auth";
-import { BoardClaimPage } from "./pages/BoardClaim";
-import { InviteLandingPage } from "./pages/InviteLanding";
 import { queryKeys } from "./lib/queryKeys";
 import { useCompany } from "./context/CompanyContext";
 import { useDialog } from "./context/DialogContext";
-
-function BootstrapPendingPage() {
-  return (
-    <div className="mx-auto max-w-xl py-10">
-      <div className="rounded-lg border border-border bg-card p-6">
-        <h1 className="text-xl font-semibold">Instance setup required</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          No instance admin exists yet. Run this command in your Crewdeck environment to generate
-          the first admin invite URL:
-        </p>
-        <pre className="mt-4 overflow-x-auto rounded-md border border-border bg-muted/30 p-3 text-xs">
-{`pnpm crewdeck auth bootstrap-ceo`}
-        </pre>
-      </div>
-    </div>
-  );
-}
 
 function CloudAccessGate() {
   const location = useLocation();
@@ -74,10 +55,6 @@ function CloudAccessGate() {
         {healthQuery.error instanceof Error ? healthQuery.error.message : "Failed to load app state"}
       </div>
     );
-  }
-
-  if (isAuthenticatedMode && healthQuery.data?.bootstrapStatus === "bootstrap_pending") {
-    return <BootstrapPendingPage />;
   }
 
   if (isAuthenticatedMode && !sessionQuery.data) {
@@ -205,8 +182,8 @@ export function App() {
     <>
       <Routes>
         <Route path="auth" element={<AuthPage />} />
-        <Route path="board-claim/:token" element={<BoardClaimPage />} />
-        <Route path="invite/:token" element={<InviteLandingPage />} />
+        <Route path="board-claim/*" element={<Navigate to="/" replace />} />
+        <Route path="invite/*" element={<Navigate to="/" replace />} />
 
         <Route element={<CloudAccessGate />}>
           <Route index element={<CompanyRootRedirect />} />

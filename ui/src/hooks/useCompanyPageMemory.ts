@@ -4,7 +4,7 @@ import { useCompany } from "../context/CompanyContext";
 import { toCompanyRelativePath } from "../lib/company-routes";
 
 const STORAGE_KEY = "crewdeck.companyPaths";
-const GLOBAL_SEGMENTS = new Set(["auth", "invite", "board-claim", "docs"]);
+const GLOBAL_SEGMENTS = new Set(["auth", "docs"]);
 
 function getCompanyPaths(): Record<string, string> {
   try {

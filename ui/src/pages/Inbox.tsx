@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { approvalsApi } from "../api/approvals";
-import { accessApi } from "../api/access";
-import { ApiError } from "../api/client";
 import { dashboardApi } from "../api/dashboard";
 import { issuesApi } from "../api/issues";
 import { agentsApi } from "../api/agents";
@@ -39,7 +37,7 @@ import {
 } from "lucide-react";
 import { Identity } from "../components/Identity";
 import { PageTabBar } from "../components/PageTabBar";
-import type { HeartbeatRun, Issue, JoinRequest } from "@crewdeck/shared";
+import type { HeartbeatRun, Issue } from "@crewdeck/shared";
 
 const STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
 const FAILED_RUN_STATUSES = new Set(["failed", "timed_out"]);
@@ -49,7 +47,6 @@ type InboxTab = "new" | "all";
 type InboxCategoryFilter =
   | "everything"
   | "assigned_to_me"
-  | "join_requests"
   | "approvals"
   | "failed_runs"
   | "alerts"
@@ -57,7 +54,6 @@ type InboxCategoryFilter =
 type InboxApprovalFilter = "all" | "actionable" | "resolved";
 type SectionKey =
   | "assigned_to_me"
-  | "join_requests"
   | "approvals"
   | "failed_runs"
   | "alerts"
@@ -277,25 +273,6 @@ export function Inbox() {
     enabled: !!selectedCompanyId,
   });
 
-  const {
-    data: joinRequests = [],
-    isLoading: isJoinRequestsLoading,
-  } = useQuery({
-    queryKey: queryKeys.access.joinRequests(selectedCompanyId!),
-    queryFn: async () => {
-      try {
-        return await accessApi.listJoinRequests(selectedCompanyId!, "pending_approval");
-      } catch (err) {
-        if (err instanceof ApiError && (err.status === 403 || err.status === 401)) {
-          return [];
-        }
-        throw err;
-      }
-    },
-    enabled: !!selectedCompanyId,
-    retry: false,
-  });
-
   const { data: dashboard, isLoading: isDashboardLoading } = useQuery({
     queryKey: queryKeys.dashboard(selectedCompanyId!),
     queryFn: () => dashboardApi.summary(selectedCompanyId!),
@@ -402,34 +379,6 @@ export function Inbox() {
     },
   });
 
-  const approveJoinMutation = useMutation({
-    mutationFn: (joinRequest: JoinRequest) =>
-      accessApi.approveJoinRequest(selectedCompanyId!, joinRequest.id),
-    onSuccess: () => {
-      setActionError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sidebarBadges(selectedCompanyId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.agents.list(selectedCompanyId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.companies.all });
-    },
-    onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to approve join request");
-    },
-  });
-
-  const rejectJoinMutation = useMutation({
-    mutationFn: (joinRequest: JoinRequest) =>
-      accessApi.rejectJoinRequest(selectedCompanyId!, joinRequest.id),
-    onSuccess: () => {
-      setActionError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.access.joinRequests(selectedCompanyId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.sidebarBadges(selectedCompanyId!) });
-    },
-    onError: (err) => {
-      setActionError(err instanceof Error ? err.message : "Failed to reject join request");
-    },
-  });
-
   if (!selectedCompanyId) {
     return <EmptyState icon={InboxIcon} message="Select a project to view inbox." />;
   }
@@ -442,20 +391,16 @@ export function Inbox() {
     dashboard.costs.monthUtilizationPercent >= 80;
   const hasAlerts = showAggregateAgentError || showBudgetAlert;
   const hasStale = staleIssues.length > 0;
-  const hasJoinRequests = joinRequests.length > 0;
   const hasAssignedToMe = assignedToMeIssues.length > 0;
 
   const newItemCount =
     assignedToMeIssues.length +
-    joinRequests.length +
     actionableApprovals.length +
     failedRuns.length +
     staleIssues.length +
     (showAggregateAgentError ? 1 : 0) +
     (showBudgetAlert ? 1 : 0);
 
-  const showJoinRequestsCategory =
-    allCategoryFilter === "everything" || allCategoryFilter === "join_requests";
   const showAssignedCategory =
     allCategoryFilter === "everything" || allCategoryFilter === "assigned_to_me";
   const showApprovalsCategory = allCategoryFilter === "everything" || allCategoryFilter === "approvals";
@@ -466,8 +411,6 @@ export function Inbox() {
 
   const approvalsToRender = tab === "new" ? actionableApprovals : filteredAllApprovals;
   const showAssignedSection = tab === "new" ? hasAssignedToMe : showAssignedCategory && hasAssignedToMe;
-  const showJoinRequestsSection =
-    tab === "new" ? hasJoinRequests : showJoinRequestsCategory && hasJoinRequests;
   const showApprovalsSection =
     tab === "new"
       ? actionableApprovals.length > 0
@@ -480,14 +423,12 @@ export function Inbox() {
   const visibleSections = [
     showAssignedSection ? "assigned_to_me" : null,
     showApprovalsSection ? "approvals" : null,
-    showJoinRequestsSection ? "join_requests" : null,
     showFailedRunsSection ? "failed_runs" : null,
     showAlertsSection ? "alerts" : null,
     showStaleSection ? "stale_work" : null,
   ].filter((key): key is SectionKey => key !== null);
 
   const allLoaded =
-    !isJoinRequestsLoading &&
     !isApprovalsLoading &&
     !isDashboardLoading &&
     !isIssuesLoading &&
@@ -532,7 +473,6 @@ export function Inbox() {
               <SelectContent>
                 <SelectItem value="everything">All categories</SelectItem>
                 <SelectItem value="assigned_to_me">Assigned to me</SelectItem>
-                <SelectItem value="join_requests">Join requests</SelectItem>
                 <SelectItem value="approvals">Approvals</SelectItem>
                 <SelectItem value="failed_runs">Failed runs</SelectItem>
                 <SelectItem value="alerts">Alerts</SelectItem>
@@ -626,60 +566,6 @@ export function Inbox() {
                   detailLink={`/approvals/${approval.id}`}
                   isPending={approveMutation.isPending || rejectMutation.isPending}
                 />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      {showJoinRequestsSection && (
-        <>
-          {showSeparatorBefore("join_requests") && <Separator />}
-          <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              Join Requests
-            </h3>
-            <div className="grid gap-3">
-              {joinRequests.map((joinRequest) => (
-                <div key={joinRequest.id} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        {joinRequest.requestType === "human"
-                          ? "Human join request"
-                          : `Agent join request${joinRequest.agentName ? `: ${joinRequest.agentName}` : ""}`}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        requested {timeAgo(joinRequest.createdAt)} from IP {joinRequest.requestIp}
-                      </p>
-                      {joinRequest.requestEmailSnapshot && (
-                        <p className="text-xs text-muted-foreground">
-                          email: {joinRequest.requestEmailSnapshot}
-                        </p>
-                      )}
-                      {joinRequest.adapterType && (
-                        <p className="text-xs text-muted-foreground">adapter: {joinRequest.adapterType}</p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={approveJoinMutation.isPending || rejectJoinMutation.isPending}
-                        onClick={() => rejectJoinMutation.mutate(joinRequest)}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        size="sm"
-                        disabled={approveJoinMutation.isPending || rejectJoinMutation.isPending}
-                        onClick={() => approveJoinMutation.mutate(joinRequest)}
-                      >
-                        Approve
-                      </Button>
-                    </div>
-                  </div>
-                </div>
               ))}
             </div>
           </div>
