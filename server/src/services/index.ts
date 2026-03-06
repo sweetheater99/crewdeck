@@ -21,3 +21,4 @@ export { metricsService, type MetricsDateRange } from "./metrics.js";
 export { createStorageServiceFromConfig, getStorageService } from "../storage/index.js";
 export { notificationService } from "./notifications.js";
 export { digestService } from "./digest.js";
+export { messageService } from "./messages.js";
