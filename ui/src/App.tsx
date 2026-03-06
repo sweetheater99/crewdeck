@@ -24,6 +24,7 @@ import { Metrics } from "./pages/Metrics";
 import { Activity } from "./pages/Activity";
 import { Inbox } from "./pages/Inbox";
 import { CompanySettings } from "./pages/CompanySettings";
+import { NotificationSettings } from "./pages/NotificationSettings";
 import { DesignGuide } from "./pages/DesignGuide";
 import { OrgChart } from "./pages/OrgChart";
 import { AuthPage } from "./pages/Auth";
@@ -74,6 +75,7 @@ function boardRoutes() {
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="companies" element={<Companies />} />
       <Route path="company/settings" element={<CompanySettings />} />
+      <Route path="company/notifications" element={<NotificationSettings />} />
       <Route path="org" element={<OrgChart />} />
       <Route path="agents" element={<Navigate to="/agents/all" replace />} />
       <Route path="agents/all" element={<Agents />} />
