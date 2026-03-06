@@ -32,6 +32,18 @@
               "start/core-concepts",
               "start/architecture"
             ]
+          },
+          {
+            "group": "User Guide",
+            "pages": [
+              "getting-started",
+              "concepts",
+              "notifications",
+              "knowledge-base",
+              "metrics",
+              "deployment",
+              "api-reference"
+            ]
           }
         ]
       },
