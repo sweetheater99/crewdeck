@@ -16,6 +16,7 @@ import { useProjectOrder } from "../hooks/useProjectOrder";
 import { relativeTime, cn, formatTokens } from "../lib/utils";
 import { InlineEditor } from "../components/InlineEditor";
 import { CommentThread } from "../components/CommentThread";
+import { MessageThread } from "../components/MessageThread";
 import { IssueProperties } from "../components/IssueProperties";
 import { LiveRunWidget } from "../components/LiveRunWidget";
 import type { MentionOption } from "../components/MarkdownEditor";
@@ -38,6 +39,7 @@ import {
   EyeOff,
   Hexagon,
   ListTree,
+  Mail,
   MessageSquare,
   MoreHorizontal,
   Crewdeck,
@@ -775,6 +777,10 @@ export function IssueDetail() {
             <ListTree className="h-3.5 w-3.5" />
             Sub-issues
           </TabsTrigger>
+          <TabsTrigger value="messages" className="gap-1.5">
+            <Mail className="h-3.5 w-3.5" />
+            Messages
+          </TabsTrigger>
           <TabsTrigger value="activity" className="gap-1.5">
             <ActivityIcon className="h-3.5 w-3.5" />
             Activity
@@ -838,6 +844,12 @@ export function IssueDetail() {
                 </Link>
               ))}
             </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="messages">
+          {selectedCompanyId && (
+            <MessageThread companyId={selectedCompanyId} issueId={issueId} />
           )}
         </TabsContent>
 

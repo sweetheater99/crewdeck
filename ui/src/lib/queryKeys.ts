@@ -74,10 +74,22 @@ export const queryKeys = {
     channels: (companyId: string) => ["notifications", "channels", companyId] as const,
     rules: (companyId: string) => ["notifications", "rules", companyId] as const,
   },
+  messages: {
+    forIssue: (companyId: string, issueId: string) =>
+      ["messages", companyId, "issue", issueId] as const,
+    forAgent: (companyId: string, agentId: string) =>
+      ["messages", companyId, "agent", agentId] as const,
+  },
   metrics: {
     overview: (companyId: string) => ["metrics", "overview", companyId] as const,
     agents: (companyId: string) => ["metrics", "agents", companyId] as const,
     trends: (companyId: string, period: string) =>
       ["metrics", "trends", companyId, period] as const,
+  },
+  knowledge: {
+    list: (companyId: string, q?: string, tags?: string) =>
+      ["knowledge", companyId, q ?? "", tags ?? ""] as const,
+    detail: (companyId: string, id: string) =>
+      ["knowledge", companyId, "detail", id] as const,
   },
 };

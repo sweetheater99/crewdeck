@@ -124,6 +124,8 @@ export type {
   NotificationChannel,
   NotificationRule,
   NotificationEventType,
+  AgentMessage,
+  KnowledgeEntry,
 } from "./types/index.js";
 
 export {

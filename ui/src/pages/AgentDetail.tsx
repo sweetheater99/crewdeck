@@ -20,6 +20,7 @@ import { StatusBadge } from "../components/StatusBadge";
 import { agentStatusDot, agentStatusDotDefault } from "../lib/status-colors";
 import { MarkdownBody } from "../components/MarkdownBody";
 import { CopyText } from "../components/CopyText";
+import { MessageThread } from "../components/MessageThread";
 import { EntityRow } from "../components/EntityRow";
 import { Identity } from "../components/Identity";
 import { PageSkeleton } from "../components/PageSkeleton";
@@ -53,6 +54,7 @@ import {
   ArrowLeft,
   Settings,
   AlertTriangle,
+  Mail,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AgentIcon, AgentIconPicker } from "../components/AgentIconPicker";
@@ -172,11 +174,12 @@ function scrollToContainerBottom(container: ScrollContainer, behavior: ScrollBeh
   container.scrollTo({ top: container.scrollHeight, behavior });
 }
 
-type AgentDetailView = "overview" | "configure" | "runs";
+type AgentDetailView = "overview" | "configure" | "runs" | "messages";
 
 function parseAgentDetailView(value: string | null): AgentDetailView {
   if (value === "configure" || value === "configuration") return "configure";
   if (value === "runs") return value;
+  if (value === "messages") return value;
   return "overview";
 }
 
@@ -406,6 +409,8 @@ export function AgentDetail() {
         crumbs.push({ label: "Configure" });
       } else if (activeView === "runs") {
         crumbs.push({ label: "Runs" });
+      } else if (activeView === "messages") {
+        crumbs.push({ label: "Messages" });
       }
     }
     setBreadcrumbs(crumbs);
@@ -524,6 +529,16 @@ export function AgentDetail() {
               >
                 <Settings className="h-3 w-3" />
                 Configure Agent
+              </button>
+              <button
+                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
+                onClick={() => {
+                  navigate(`/agents/${canonicalAgentRef}/messages`);
+                  setMoreOpen(false);
+                }}
+              >
+                <Mail className="h-3 w-3" />
+                Messages
               </button>
               <button
                 className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
@@ -659,6 +674,13 @@ export function AgentDetail() {
           selectedRunId={urlRunId ?? null}
           adapterType={agent.adapterType}
         />
+      )}
+
+      {activeView === "messages" && resolvedCompanyId && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium">Messages</h3>
+          <MessageThread companyId={resolvedCompanyId} agentId={agent.id} />
+        </div>
       )}
     </div>
   );
