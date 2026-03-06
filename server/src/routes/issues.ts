@@ -45,7 +45,26 @@ export function issueRoutes(db: Db, storage: StorageService) {
   const projectsSvc = projectService(db);
   const goalsSvc = goalService(db);
   const issueApprovalsSvc = issueApprovalService(db);
-  const depsSvc = dependencyService(db);
+  const depsSvc = dependencyService(db, {
+    onUnblocked: (companyId, issueId, agentId) => {
+      void heartbeat
+        .wakeup(agentId, {
+          source: "automation",
+          triggerDetail: "system",
+          reason: "dependency_resolved",
+          requestedByActorType: "system",
+          requestedByActorId: "dependency_service",
+          contextSnapshot: {
+            issueId,
+            wakeReason: "dependency_resolved",
+            wakeSource: "automation",
+          },
+        })
+        .catch((err) =>
+          logger.warn({ err, issueId, agentId }, "failed to auto-wake agent on dependency resolution"),
+        );
+    },
+  });
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_ATTACHMENT_BYTES, files: 1 },

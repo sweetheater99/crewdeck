@@ -5,7 +5,12 @@ import { unprocessable, notFound } from "../errors.js";
 
 const DONE_STATUSES = new Set(["done", "cancelled"]);
 
-export function dependencyService(db: Db) {
+export interface DependencyServiceOptions {
+  /** Called when a blocked issue becomes unblocked and has an assigned agent. */
+  onUnblocked?: (companyId: string, issueId: string, agentId: string) => void | Promise<void>;
+}
+
+export function dependencyService(db: Db, opts: DependencyServiceOptions = {}) {
   async function recalculateBlockedStatus(companyId: string, issueId: string) {
     // Fetch the issue
     const issue = await db
@@ -53,6 +58,11 @@ export function dependencyService(db: Db) {
         .update(issues)
         .set({ status: nextStatus, updatedAt: new Date() })
         .where(eq(issues.id, issueId));
+
+      // Auto-wake the assigned agent now that this issue is unblocked
+      if (issue.assigneeAgentId && opts.onUnblocked) {
+        void Promise.resolve(opts.onUnblocked(companyId, issueId, issue.assigneeAgentId)).catch(() => {});
+      }
     }
   }
 
