@@ -1199,5 +1199,22 @@ export function issueRoutes(db: Db, storage: StorageService) {
     res.json({ ok: true });
   });
 
+  router.get("/companies/:companyId/issues/:issueId/dependents", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    const issueId = req.params.issueId as string;
+    assertCompanyAccess(req, companyId);
+    const issue = await svc.getById(issueId);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.companyId !== companyId) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    const dependents = await depsSvc.getDependents(companyId, issueId);
+    res.json(dependents);
+  });
+
   return router;
 }

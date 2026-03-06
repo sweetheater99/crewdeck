@@ -68,4 +68,24 @@ export const issuesApi = {
     api.post<Approval[]>(`/issues/${id}/approvals`, { approvalId }),
   unlinkApproval: (id: string, approvalId: string) =>
     api.delete<{ ok: true }>(`/issues/${id}/approvals/${approvalId}`),
+
+  // Dependencies
+  getDependencies: (companyId: string, issueId: string) =>
+    api.get<
+      { id: string; dependsOnId: string; title: string; status: string; identifier: string | null; createdAt: string }[]
+    >(`/companies/${companyId}/issues/${issueId}/dependencies`),
+
+  getDependents: (companyId: string, issueId: string) =>
+    api.get<
+      { id: string; issueId: string; title: string; status: string; identifier: string | null; createdAt: string }[]
+    >(`/companies/${companyId}/issues/${issueId}/dependents`),
+
+  addDependency: (companyId: string, issueId: string, dependsOnId: string) =>
+    api.post<{ id: string; companyId: string; issueId: string; dependsOnId: string; createdAt: string }>(
+      `/companies/${companyId}/issues/${issueId}/dependencies`,
+      { dependsOnId },
+    ),
+
+  removeDependency: (companyId: string, issueId: string, dependsOnId: string) =>
+    api.delete<{ ok: true }>(`/companies/${companyId}/issues/${issueId}/dependencies/${dependsOnId}`),
 };

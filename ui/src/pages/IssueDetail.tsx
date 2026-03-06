@@ -22,6 +22,7 @@ import type { MentionOption } from "../components/MarkdownEditor";
 import { StatusIcon } from "../components/StatusIcon";
 import { PriorityIcon } from "../components/PriorityIcon";
 import { StatusBadge } from "../components/StatusBadge";
+import { DependencyPicker } from "../components/DependencyPicker";
 import { Identity } from "../components/Identity";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -840,6 +841,11 @@ export function IssueDetail() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Dependencies */}
+      <div className="rounded-lg border border-border px-3 py-3">
+        <DependencyPicker issueId={issue.id} companyId={issue.companyId} />
+      </div>
 
       {linkedApprovals && linkedApprovals.length > 0 && (
         <Collapsible
