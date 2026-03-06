@@ -19,6 +19,7 @@ export type {
   IssueAncestorProject,
   IssueAncestorGoal,
   IssueAttachment,
+  IssueDependency,
   IssueLabel,
 } from "./issue.js";
 export type { Goal } from "./goal.js";

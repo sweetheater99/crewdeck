@@ -97,6 +97,14 @@ export interface IssueComment {
   updatedAt: Date;
 }
 
+export interface IssueDependency {
+  id: string;
+  companyId: string;
+  issueId: string;
+  dependsOnId: string;
+  createdAt: Date;
+}
+
 export interface IssueAttachment {
   id: string;
   companyId: string;
