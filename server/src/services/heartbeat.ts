@@ -11,6 +11,7 @@ import {
   heartbeatRuns,
   costEvents,
   issues,
+  issueComments,
   projectWorkspaces,
 } from "@crewdeck/db";
 import { conflict, notFound } from "../errors.js";
@@ -33,6 +34,27 @@ const REPO_ONLY_CWD_SENTINEL = "/__crewdeck_repo_only__";
 
 function appendExcerpt(prev: string, chunk: string) {
   return appendWithCap(prev, chunk, MAX_EXCERPT_BYTES);
+}
+
+type EscalationAction =
+  | { action: "retry"; delaySec: number }
+  | { action: "reassign"; fallbackAgentId: string }
+  | { action: "escalate" };
+
+export function getEscalationAction(
+  consecutiveFailures: number,
+  retryPolicy: { maxRetries: number; backoffSec: number } | null,
+  fallbackAgentId: string | null,
+): EscalationAction {
+  const policy = retryPolicy ?? { maxRetries: 3, backoffSec: 300 };
+
+  if (consecutiveFailures < policy.maxRetries) {
+    return { action: "retry", delaySec: policy.backoffSec };
+  }
+  if (fallbackAgentId) {
+    return { action: "reassign", fallbackAgentId };
+  }
+  return { action: "escalate" };
 }
 
 function normalizeMaxConcurrentRuns(value: unknown) {
@@ -1393,6 +1415,17 @@ export function heartbeatService(db: Db) {
         }
       }
       await finalizeAgentStatus(agent.id, outcome);
+
+      // --- Failure escalation / success reset ---
+      if (outcome === "succeeded") {
+        if (agent.consecutiveFailures > 0) {
+          await db.update(agents)
+            .set({ consecutiveFailures: 0, updatedAt: new Date() })
+            .where(eq(agents.id, agent.id));
+        }
+      } else if (outcome === "failed") {
+        await handleFailureEscalation(agent.id, agent.companyId, issueId ?? null);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown adapter failure";
       logger.error({ err, runId }, "heartbeat execution failed");
@@ -1454,8 +1487,128 @@ export function heartbeatService(db: Db) {
       }
 
       await finalizeAgentStatus(agent.id, "failed");
+
+      // --- Failure escalation (catch path) ---
+      await handleFailureEscalation(agent.id, agent.companyId, issueId ?? null);
     } finally {
       await startNextQueuedRunForAgent(agent.id);
+    }
+  }
+
+  /**
+   * Handles failure escalation: increment consecutive failures, decide action
+   * (retry / reassign / escalate), and apply circuit breaker.
+   */
+  async function handleFailureEscalation(
+    agentId: string,
+    companyId: string,
+    issueId: string | null,
+  ) {
+    try {
+      // 1. Increment consecutiveFailures
+      await db.update(agents)
+        .set({ consecutiveFailures: sql`consecutive_failures + 1`, updatedAt: new Date() })
+        .where(eq(agents.id, agentId));
+
+      // 2. Re-fetch agent to get updated failure count
+      const updatedAgent = await getAgent(agentId);
+      if (!updatedAgent) return;
+
+      // 3. Determine escalation action
+      const escalation = getEscalationAction(
+        updatedAgent.consecutiveFailures,
+        updatedAgent.retryPolicy,
+        updatedAgent.fallbackAgentId,
+      );
+
+      switch (escalation.action) {
+        case "retry": {
+          if (issueId) {
+            logger.info(
+              { agentId, issueId, delaySec: escalation.delaySec, failures: updatedAgent.consecutiveFailures },
+              "scheduling retry with backoff",
+            );
+            setTimeout(() => {
+              void enqueueWakeup(agentId, {
+                source: "on_demand",
+                triggerDetail: "system",
+                reason: "failure_retry",
+                contextSnapshot: { issueId },
+              }).catch((retryErr) => {
+                logger.warn({ err: retryErr, agentId, issueId }, "failed to enqueue retry wakeup");
+              });
+            }, escalation.delaySec * 1000);
+          }
+          break;
+        }
+        case "reassign": {
+          if (issueId) {
+            logger.info(
+              { agentId, issueId, fallbackAgentId: escalation.fallbackAgentId },
+              "reassigning issue to fallback agent",
+            );
+            await db.update(issues)
+              .set({ assigneeAgentId: escalation.fallbackAgentId, updatedAt: new Date() })
+              .where(eq(issues.id, issueId));
+
+            // Wake the fallback agent for this issue
+            void enqueueWakeup(escalation.fallbackAgentId, {
+              source: "on_demand",
+              triggerDetail: "system",
+              reason: "fallback_reassignment",
+              contextSnapshot: { issueId },
+            }).catch((wakeErr) => {
+              logger.warn({ err: wakeErr, fallbackAgentId: escalation.fallbackAgentId, issueId }, "failed to wake fallback agent");
+            });
+          }
+          break;
+        }
+        case "escalate": {
+          logger.warn(
+            { agentId, issueId, failures: updatedAgent.consecutiveFailures },
+            "agent failures exhausted retries — escalating to owner",
+          );
+          if (issueId) {
+            await db.insert(issueComments).values({
+              companyId,
+              issueId,
+              authorAgentId: null,
+              authorUserId: null,
+              body: `⚠️ Escalation: Agent failed ${updatedAgent.consecutiveFailures} consecutive times. All retries exhausted and no fallback agent configured. This issue needs manual attention.`,
+            });
+          }
+          break;
+        }
+      }
+
+      // 4. Circuit breaker: if 3+ distinct tasks failed in 24h, auto-pause the agent
+      const recentFailures = await db.execute(sql`
+        SELECT COUNT(DISTINCT context_snapshot->>'issueId') as failed_tasks
+        FROM heartbeat_runs
+        WHERE agent_id = ${agentId}
+          AND status = 'failed'
+          AND started_at > now() - interval '24 hours'
+          AND context_snapshot->>'issueId' IS NOT NULL
+      `);
+
+      const failedTaskCount = Number((recentFailures as unknown as Record<string, unknown>[])[0]?.failed_tasks ?? 0);
+      if (failedTaskCount >= 3 && updatedAgent.status !== "paused") {
+        await db.update(agents)
+          .set({ status: "paused", updatedAt: new Date() })
+          .where(eq(agents.id, agentId));
+        logger.warn(
+          { agentId, failedTaskCount },
+          "agent auto-paused: circuit breaker tripped (3+ task failures in 24h)",
+        );
+        publishLiveEvent({
+          companyId,
+          type: "agent.status",
+          payload: { agentId, status: "paused", reason: "circuit_breaker" },
+        });
+      }
+    } catch (escalationErr) {
+      // Escalation logic should never break the main flow
+      logger.error({ err: escalationErr, agentId }, "failure escalation handler error");
     }
   }
 
