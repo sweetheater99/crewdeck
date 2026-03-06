@@ -17,4 +17,5 @@ export { companyPortabilityService } from "./company-portability.js";
 export { dependencyService } from "./dependencies.js";
 export { logActivity, type LogActivityInput } from "./activity-log.js";
 export { publishLiveEvent, subscribeCompanyLiveEvents } from "./live-events.js";
+export { metricsService, type MetricsDateRange } from "./metrics.js";
 export { createStorageServiceFromConfig, getStorageService } from "../storage/index.js";
