@@ -12,6 +12,7 @@ import {
   ClipboardCheck,
   BarChart3,
   Bell,
+  BookOpen,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { SidebarSection } from "./SidebarSection";
@@ -98,6 +99,7 @@ export function Sidebar() {
             icon={ClipboardCheck}
             badge={sidebarBadges?.pendingReviews}
           />
+          <SidebarNavItem to="/knowledge" label="Knowledge" icon={BookOpen} />
         </SidebarSection>
 
         <SidebarProjects />
