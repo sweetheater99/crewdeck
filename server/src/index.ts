@@ -24,7 +24,7 @@ import { createApp } from "./app.js";
 import { loadConfig } from "./config.js";
 import { logger } from "./middleware/logger.js";
 import { setupLiveEventsWebSocketServer } from "./realtime/live-events-ws.js";
-import { heartbeatService } from "./services/index.js";
+import { heartbeatService, digestService } from "./services/index.js";
 import { createStorageServiceFromConfig } from "./storage/index.js";
 import { printStartupBanner } from "./startup-banner.js";
 import { getBoardClaimWarningUrl, initializeBoardClaimChallenge } from "./board-claim.js";
@@ -492,6 +492,16 @@ if (config.heartbeatSchedulerEnabled) {
         logger.error({ err }, "periodic reap of orphaned heartbeat runs failed");
       });
   }, config.heartbeatSchedulerIntervalMs);
+}
+
+// Daily digest scheduler — checks every 60s if any channel needs a digest sent
+{
+  const digest = digestService(db as any);
+  setInterval(() => {
+    void digest.checkDigestSchedule().catch((err) => {
+      logger.error({ err }, "digest schedule check failed");
+    });
+  }, 60_000);
 }
 
 if (config.databaseBackupEnabled) {
