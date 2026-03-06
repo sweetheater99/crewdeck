@@ -13,12 +13,13 @@ import { usePanel } from "../context/PanelContext";
 import { useBreadcrumbs } from "../context/BreadcrumbContext";
 import { queryKeys } from "../lib/queryKeys";
 import { useProjectOrder } from "../hooks/useProjectOrder";
-import { relativeTime, cn, formatTokens } from "../lib/utils";
+import { relativeTime, cn, formatTokens, formatDate } from "../lib/utils";
 import { InlineEditor } from "../components/InlineEditor";
 import { CommentThread } from "../components/CommentThread";
 import { MessageThread } from "../components/MessageThread";
 import { IssueProperties } from "../components/IssueProperties";
 import { LiveRunWidget } from "../components/LiveRunWidget";
+import { RunLogInline } from "../components/RunLogInline";
 import type { MentionOption } from "../components/MarkdownEditor";
 import { StatusIcon } from "../components/StatusIcon";
 import { PriorityIcon } from "../components/PriorityIcon";
@@ -160,7 +161,9 @@ export function IssueDetail() {
   const [secondaryOpen, setSecondaryOpen] = useState({
     approvals: false,
     cost: false,
+    runHistory: false,
   });
+  const [expandedRunLogId, setExpandedRunLogId] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -907,6 +910,60 @@ export function IssueDetail() {
                   <span className="text-muted-foreground">{relativeTime(approval.createdAt)}</span>
                 </Link>
               ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {linkedRuns && linkedRuns.length > 0 && (
+        <Collapsible
+          open={secondaryOpen.runHistory}
+          onOpenChange={(open) => setSecondaryOpen((prev) => ({ ...prev, runHistory: open }))}
+          className="rounded-lg border border-border"
+        >
+          <CollapsibleTrigger className="flex w-full items-center justify-between px-3 py-2 text-left">
+            <span className="text-sm font-medium text-muted-foreground">
+              Run History ({linkedRuns.length})
+            </span>
+            <ChevronDown
+              className={cn("h-4 w-4 text-muted-foreground transition-transform", secondaryOpen.runHistory && "rotate-180")}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="border-t border-border divide-y divide-border">
+              {[...linkedRuns]
+                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                .map((run) => (
+                  <div key={run.runId}>
+                    <button
+                      className={cn(
+                        "flex items-center gap-2 w-full px-3 py-2 text-xs text-left hover:bg-accent/20 transition-colors",
+                        expandedRunLogId === run.runId && "bg-accent/10",
+                      )}
+                      onClick={() => setExpandedRunLogId(expandedRunLogId === run.runId ? null : run.runId)}
+                    >
+                      <ChevronRight
+                        className={cn("h-3 w-3 text-muted-foreground shrink-0 transition-transform", expandedRunLogId === run.runId && "rotate-90")}
+                      />
+                      <StatusBadge status={run.status} />
+                      <Link
+                        to={`/agents/${run.agentId}/runs/${run.runId}`}
+                        className="font-mono text-muted-foreground hover:text-foreground"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {run.runId.slice(0, 8)}
+                      </Link>
+                      <span className="text-muted-foreground ml-auto shrink-0">
+                        {formatDate(run.startedAt ?? run.createdAt)}
+                      </span>
+                    </button>
+                    {expandedRunLogId === run.runId && (
+                      <div className="px-3 pb-3">
+                        <RunLogInline runId={run.runId} maxHeight={400} />
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
           </CollapsibleContent>
         </Collapsible>

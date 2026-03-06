@@ -55,6 +55,7 @@ import {
   Settings,
   AlertTriangle,
   Mail,
+  ScrollText,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AgentIcon, AgentIconPicker } from "../components/AgentIconPicker";
@@ -543,6 +544,16 @@ export function AgentDetail() {
               <button
                 className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
                 onClick={() => {
+                  navigate(`/agents/${canonicalAgentRef}/logs`);
+                  setMoreOpen(false);
+                }}
+              >
+                <ScrollText className="h-3 w-3" />
+                Run Logs
+              </button>
+              <button
+                className="flex items-center gap-2 w-full px-2 py-1.5 text-xs rounded hover:bg-accent/50"
+                onClick={() => {
                   navigator.clipboard.writeText(agent.id);
                   setMoreOpen(false);
                 }}
@@ -746,12 +757,20 @@ function LatestRunCard({ runs, agentId }: { runs: HeartbeatRun[]; agentId: strin
           )}
           {isLive ? "Live Run" : "Latest Run"}
         </h3>
-        <Link
-          to={`/agents/${agentId}/runs/${run.id}`}
-          className="shrink-0 text-xs text-muted-foreground hover:text-foreground transition-colors no-underline"
-        >
-          View details &rarr;
-        </Link>
+        <div className="flex items-center gap-3 shrink-0">
+          <Link
+            to={`/agents/${agentId}/logs`}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors no-underline"
+          >
+            All logs
+          </Link>
+          <Link
+            to={`/agents/${agentId}/runs/${run.id}`}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors no-underline"
+          >
+            View details &rarr;
+          </Link>
+        </div>
       </div>
 
       <Link
