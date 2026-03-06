@@ -33,4 +33,6 @@ CREATE INDEX "agent_messages_company_idx" ON "agent_messages" USING btree ("comp
 CREATE INDEX "agent_messages_issue_idx" ON "agent_messages" USING btree ("issue_id");--> statement-breakpoint
 CREATE INDEX "agent_messages_from_agent_idx" ON "agent_messages" USING btree ("from_agent_id");--> statement-breakpoint
 CREATE INDEX "agent_messages_to_agent_idx" ON "agent_messages" USING btree ("to_agent_id");--> statement-breakpoint
-CREATE INDEX "knowledge_entries_company_idx" ON "knowledge_entries" USING btree ("company_id");
+CREATE INDEX "knowledge_entries_company_idx" ON "knowledge_entries" USING btree ("company_id");--> statement-breakpoint
+CREATE INDEX "idx_knowledge_tags" ON "knowledge_entries" USING GIN ("tags");--> statement-breakpoint
+CREATE INDEX "idx_knowledge_search" ON "knowledge_entries" USING GIN (to_tsvector('english', "title" || ' ' || "content"));
