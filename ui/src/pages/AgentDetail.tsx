@@ -52,6 +52,7 @@ import {
   ChevronDown,
   ArrowLeft,
   Settings,
+  AlertTriangle,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { AgentIcon, AgentIconPicker } from "../components/AgentIconPicker";
@@ -490,6 +491,9 @@ export function AgentDetail() {
             </Button>
           )}
           <span className="hidden sm:inline"><StatusBadge status={agent.status} /></span>
+          {agent.consecutiveFailures > 0 && (
+            <AgentFailureIndicator agent={agent} />
+          )}
           {mobileLiveRun && (
             <Link
               to={`/agents/${canonicalAgentRef}/runs/${mobileLiveRun.id}`}
@@ -668,6 +672,27 @@ function SummaryRow({ label, children }: { label: string; children: React.ReactN
       <span className="text-muted-foreground text-xs">{label}</span>
       <div className="flex items-center gap-1">{children}</div>
     </div>
+  );
+}
+
+function AgentFailureIndicator({ agent }: { agent: Agent }) {
+  const maxRetries = (agent.retryPolicy ?? { maxRetries: 3 }).maxRetries;
+  const isTripped = agent.status === "paused" && agent.consecutiveFailures >= maxRetries;
+
+  if (isTripped) {
+    return (
+      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-[11px] font-medium text-red-600 dark:text-red-400">
+        <AlertTriangle className="h-3 w-3" />
+        Circuit breaker tripped
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+      <AlertTriangle className="h-3 w-3" />
+      {agent.consecutiveFailures}/{maxRetries} retries
+    </span>
   );
 }
 
@@ -895,6 +920,11 @@ function ConfigSummary({
                 : <span className="text-muted-foreground">Never</span>
               }
             </SummaryRow>
+            {agent.consecutiveFailures > 0 && (
+              <SummaryRow label="Failure status">
+                <AgentFailureIndicator agent={agent} />
+              </SummaryRow>
+            )}
             <SummaryRow label="Reports to">
               {reportsToAgent ? (
                 <Link

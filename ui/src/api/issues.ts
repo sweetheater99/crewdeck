@@ -88,4 +88,8 @@ export const issuesApi = {
 
   removeDependency: (companyId: string, issueId: string, dependsOnId: string) =>
     api.delete<{ ok: true }>(`/companies/${companyId}/issues/${issueId}/dependencies/${dependsOnId}`),
+
+  // Review gates
+  reviewIssue: (companyId: string, issueId: string, action: "approve" | "reject", feedback?: string) =>
+    api.post<Issue>(`/companies/${companyId}/issues/${issueId}/review`, { action, feedback }),
 };

@@ -17,7 +17,7 @@ import { relativeTime, cn, agentRouteRef, agentUrl } from "../lib/utils";
 import { PageTabBar } from "../components/PageTabBar";
 import { Tabs } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Bot, Plus, List, GitBranch, SlidersHorizontal } from "lucide-react";
+import { Bot, Plus, List, GitBranch, SlidersHorizontal, AlertTriangle } from "lucide-react";
 import type { Agent } from "@crewdeck/shared";
 
 const adapterLabels: Record<string, string> = {
@@ -260,6 +260,7 @@ export function Agents() {
                           liveCount={liveRunByAgent.get(agent.id)!.liveCount}
                         />
                       )}
+                      <FailureIndicator agent={agent} />
                       <span className="text-xs text-muted-foreground font-mono w-14 text-right">
                         {adapterLabels[agent.adapterType] ?? agent.adapterType}
                       </span>
@@ -361,6 +362,7 @@ function OrgTreeNode({
             )}
             {agent && (
               <>
+                <FailureIndicator agent={agent} />
                 <span className="text-xs text-muted-foreground font-mono w-14 text-right">
                   {adapterLabels[agent.adapterType] ?? agent.adapterType}
                 </span>
@@ -409,5 +411,27 @@ function LiveRunIndicator({
         Live{liveCount > 1 ? ` (${liveCount})` : ""}
       </span>
     </Link>
+  );
+}
+
+function FailureIndicator({ agent }: { agent: Agent }) {
+  if (agent.consecutiveFailures <= 0) return null;
+  const maxRetries = (agent.retryPolicy ?? { maxRetries: 3 }).maxRetries;
+  const isTripped = agent.status === "paused" && agent.consecutiveFailures >= maxRetries;
+
+  if (isTripped) {
+    return (
+      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-[11px] font-medium text-red-600 dark:text-red-400">
+        <AlertTriangle className="h-3 w-3" />
+        Circuit breaker
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+      <AlertTriangle className="h-3 w-3" />
+      {agent.consecutiveFailures}/{maxRetries} retries
+    </span>
   );
 }

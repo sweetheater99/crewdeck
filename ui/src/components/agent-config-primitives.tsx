@@ -47,6 +47,10 @@ export const help: Record<string, string> = {
   cooldownSec: "Minimum seconds between consecutive heartbeat runs.",
   maxConcurrentRuns: "Maximum number of heartbeat runs that can execute simultaneously for this agent.",
   budgetMonthlyCents: "Monthly spending limit in cents. 0 means no limit.",
+  requiresReview: "When enabled, completed tasks are held for owner review before being marked as done.",
+  maxRetries: "Number of consecutive failures before the agent is paused or work is reassigned to a fallback agent.",
+  backoffSec: "How long to wait before scheduling the next retry after a failure.",
+  fallbackAgent: "If all retries are exhausted, reassign the failing task to this agent. Leave empty to pause instead.",
 };
 
 export const adapterLabels: Record<string, string> = {

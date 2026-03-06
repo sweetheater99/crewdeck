@@ -568,6 +568,22 @@ export function IssueDetail() {
             </span>
           )}
 
+          {issue.reviewStatus === "pending_review" && (
+            <span className="inline-flex items-center rounded-full bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400 shrink-0">
+              Pending Review
+            </span>
+          )}
+          {issue.reviewStatus === "approved" && (
+            <span className="inline-flex items-center rounded-full bg-green-500/10 border border-green-500/30 px-2 py-0.5 text-[10px] font-medium text-green-600 dark:text-green-400 shrink-0">
+              Approved
+            </span>
+          )}
+          {issue.reviewStatus === "rejected" && (
+            <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/30 px-2 py-0.5 text-[10px] font-medium text-red-600 dark:text-red-400 shrink-0">
+              Rejected
+            </span>
+          )}
+
           {issue.projectId ? (
             <Link
               to={`/projects/${issue.projectId}`}

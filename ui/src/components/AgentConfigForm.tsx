@@ -23,7 +23,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { FolderOpen, Heart, ChevronDown, X } from "lucide-react";
+import { FolderOpen, Heart, ChevronDown, X, ShieldAlert } from "lucide-react";
+import type { Agent as AgentType } from "@crewdeck/shared";
 import { cn } from "../lib/utils";
 import { queryKeys } from "../lib/queryKeys";
 import { useCompany } from "../context/CompanyContext";
@@ -168,6 +169,13 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
     queryKey: selectedCompanyId ? queryKeys.secrets.list(selectedCompanyId) : ["secrets", "none"],
     queryFn: () => secretsApi.list(selectedCompanyId!),
     enabled: Boolean(selectedCompanyId),
+  });
+
+  // Agents in the same project — used for fallback agent picker
+  const { data: projectAgents = [] } = useQuery({
+    queryKey: selectedCompanyId ? queryKeys.agents.list(selectedCompanyId) : ["agents", "none"],
+    queryFn: () => agentsApi.list(selectedCompanyId!),
+    enabled: Boolean(selectedCompanyId) && !isCreate,
   });
 
   const createSecret = useMutation({
@@ -829,13 +837,152 @@ export function AgentConfigForm(props: AgentConfigFormProps) {
                   className={inputClass}
                 />
               </Field>
+              <ToggleField
+                label="Require owner review before completing tasks"
+                hint={help.requiresReview}
+                checked={eff(
+                  "runtime",
+                  "requiresReview",
+                  (props as { agent: Agent }).agent.requiresReview ?? false,
+                )}
+                onChange={(v) => mark("runtime", "requiresReview", v)}
+              />
             </div>
           </CollapsibleSection>
           </div>
         </div>
       )}
 
+      {/* ---- Failure Handling (edit mode only) ---- */}
+      {!isCreate && (
+        <div className={cn(!cards && "border-b border-border")}>
+          {cards
+            ? <h3 className="text-sm font-medium flex items-center gap-2 mb-3"><ShieldAlert className="h-3 w-3" /> Failure Handling</h3>
+            : <div className="px-4 py-2 text-xs font-medium text-muted-foreground flex items-center gap-2"><ShieldAlert className="h-3 w-3" /> Failure Handling</div>
+          }
+          <div className={cn(cards ? "border border-border rounded-lg p-4 space-y-3" : "px-4 pb-3 space-y-3")}>
+            <Field label="Max retries before escalation" hint="Number of consecutive failures before the agent is paused or work is reassigned to a fallback agent.">
+              <DraftNumberInput
+                value={eff(
+                  "runtime",
+                  "retryPolicy",
+                  props.agent.retryPolicy ?? { maxRetries: 3, backoffSec: 300 },
+                ).maxRetries}
+                onCommit={(v) => {
+                  const current = eff(
+                    "runtime",
+                    "retryPolicy",
+                    props.agent.retryPolicy ?? { maxRetries: 3, backoffSec: 300 },
+                  );
+                  mark("runtime", "retryPolicy", { ...current, maxRetries: v });
+                }}
+                immediate
+                className={inputClass}
+                min={0}
+              />
+            </Field>
+            <Field label="Backoff delay between retries (seconds)" hint="How long to wait before scheduling the next retry after a failure.">
+              <DraftNumberInput
+                value={eff(
+                  "runtime",
+                  "retryPolicy",
+                  props.agent.retryPolicy ?? { maxRetries: 3, backoffSec: 300 },
+                ).backoffSec}
+                onCommit={(v) => {
+                  const current = eff(
+                    "runtime",
+                    "retryPolicy",
+                    props.agent.retryPolicy ?? { maxRetries: 3, backoffSec: 300 },
+                  );
+                  mark("runtime", "retryPolicy", { ...current, backoffSec: v });
+                }}
+                immediate
+                className={inputClass}
+                min={0}
+              />
+            </Field>
+            <Field label="Fallback agent (reassign on failure)" hint="If all retries are exhausted, reassign the failing task to this agent. Leave empty to pause instead.">
+              <FallbackAgentPicker
+                value={eff("runtime", "fallbackAgentId", props.agent.fallbackAgentId)}
+                onChange={(v) => mark("runtime", "fallbackAgentId", v)}
+                agents={projectAgents}
+                excludeAgentId={props.agent.id}
+              />
+            </Field>
+            {props.agent.consecutiveFailures > 0 && (
+              <div className="rounded-md border border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-300">
+                <span className="font-medium">
+                  {props.agent.consecutiveFailures}/{(props.agent.retryPolicy ?? { maxRetries: 3 }).maxRetries} retries used
+                </span>
+                {props.agent.status === "paused" && props.agent.consecutiveFailures >= (props.agent.retryPolicy ?? { maxRetries: 3 }).maxRetries && (
+                  <span className="ml-2">— Circuit breaker tripped</span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
+  );
+}
+
+/* ---- Fallback Agent Picker ---- */
+
+function FallbackAgentPicker({
+  value,
+  onChange,
+  agents,
+  excludeAgentId,
+}: {
+  value: string | null;
+  onChange: (v: string | null) => void;
+  agents: AgentType[];
+  excludeAgentId: string;
+}) {
+  const options = agents.filter(
+    (a) => a.id !== excludeAgentId && a.status !== "terminated",
+  );
+  const selectedAgent = options.find((a) => a.id === value);
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-full flex items-center justify-between rounded-md border border-border px-2.5 py-1.5 text-sm bg-transparent hover:bg-accent/30 transition-colors"
+        >
+          <span className={selectedAgent ? "text-foreground" : "text-muted-foreground/40"}>
+            {selectedAgent ? selectedAgent.name : "None (pause on failure)"}
+          </span>
+          <ChevronDown className="h-3 w-3 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-64 p-1 max-h-60 overflow-y-auto">
+        <button
+          className="w-full text-left px-2.5 py-1.5 text-sm hover:bg-accent/50 transition-colors rounded-sm"
+          onClick={() => onChange(null)}
+        >
+          <span className="text-muted-foreground">None (pause on failure)</span>
+        </button>
+        {options.map((a) => (
+          <button
+            key={a.id}
+            className={cn(
+              "w-full text-left px-2.5 py-1.5 text-sm hover:bg-accent/50 transition-colors rounded-sm",
+              a.id === value && "bg-accent",
+            )}
+            onClick={() => onChange(a.id)}
+          >
+            {a.name}
+            <span className="ml-1.5 text-xs text-muted-foreground">({a.role})</span>
+          </button>
+        ))}
+        {options.length === 0 && (
+          <p className="px-2.5 py-1.5 text-xs text-muted-foreground">No other agents in this project.</p>
+        )}
+      </PopoverContent>
+    </Popover>
   );
 }
 
