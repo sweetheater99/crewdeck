@@ -15,6 +15,7 @@ import { validate } from "../middleware/validate.js";
 import {
   accessService,
   agentService,
+  dependencyService,
   goalService,
   heartbeatService,
   issueApprovalService,
@@ -44,6 +45,7 @@ export function issueRoutes(db: Db, storage: StorageService) {
   const projectsSvc = projectService(db);
   const goalsSvc = goalService(db);
   const issueApprovalsSvc = issueApprovalService(db);
+  const depsSvc = dependencyService(db);
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: MAX_ATTACHMENT_BYTES, files: 1 },
@@ -480,6 +482,13 @@ export function issueRoutes(db: Db, storage: StorageService) {
       entityId: issue.id,
       details: { ...updateFields, identifier: issue.identifier, _previous: Object.keys(previous).length > 0 ? previous : undefined },
     });
+
+    // When an issue transitions to done, recalculate blocked status of dependents
+    if (updateFields.status === "done" && existing.status !== "done") {
+      void depsSvc
+        .onIssueCompleted(issue.companyId, issue.id)
+        .catch((err) => logger.warn({ err, issueId: issue.id }, "failed to recalculate dependents on issue completion"));
+    }
 
     let comment = null;
     if (commentBody) {
@@ -1085,6 +1094,89 @@ export function issueRoutes(db: Db, storage: StorageService) {
       },
     });
 
+    res.json({ ok: true });
+  });
+
+  // --- Dependency routes ---
+
+  router.get("/companies/:companyId/issues/:issueId/dependencies", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    const issueId = req.params.issueId as string;
+    assertCompanyAccess(req, companyId);
+    const issue = await svc.getById(issueId);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.companyId !== companyId) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    const dependencies = await depsSvc.getDependencies(companyId, issueId);
+    res.json(dependencies);
+  });
+
+  router.post("/companies/:companyId/issues/:issueId/dependencies", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    const issueId = req.params.issueId as string;
+    assertCompanyAccess(req, companyId);
+    const issue = await svc.getById(issueId);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.companyId !== companyId) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    const { dependsOnId } = req.body;
+    if (!dependsOnId || typeof dependsOnId !== "string") {
+      res.status(400).json({ error: "dependsOnId is required" });
+      return;
+    }
+    const dependency = await depsSvc.addDependency(companyId, issueId, dependsOnId);
+    const actor = getActorInfo(req);
+    await logActivity(db, {
+      companyId,
+      actorType: actor.actorType,
+      actorId: actor.actorId,
+      agentId: actor.agentId,
+      runId: actor.runId,
+      action: "issue.dependency_added",
+      entityType: "issue",
+      entityId: issueId,
+      details: { dependsOnId },
+    });
+    res.status(201).json(dependency);
+  });
+
+  router.delete("/companies/:companyId/issues/:issueId/dependencies/:dependsOnId", async (req, res) => {
+    const companyId = req.params.companyId as string;
+    const issueId = req.params.issueId as string;
+    const dependsOnId = req.params.dependsOnId as string;
+    assertCompanyAccess(req, companyId);
+    const issue = await svc.getById(issueId);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.companyId !== companyId) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    await depsSvc.removeDependency(companyId, issueId, dependsOnId);
+    const actor = getActorInfo(req);
+    await logActivity(db, {
+      companyId,
+      actorType: actor.actorType,
+      actorId: actor.actorId,
+      agentId: actor.agentId,
+      runId: actor.runId,
+      action: "issue.dependency_removed",
+      entityType: "issue",
+      entityId: issueId,
+      details: { dependsOnId },
+    });
     res.json({ ok: true });
   });
 
