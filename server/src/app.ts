@@ -25,6 +25,8 @@ import { llmRoutes } from "./routes/llms.js";
 import { assetRoutes } from "./routes/assets.js";
 import { accessRoutes } from "./routes/access.js";
 import { metricsRoutes } from "./routes/metrics.js";
+import { notificationRoutes } from "./routes/notifications.js";
+import { notificationCallbackRoutes } from "./routes/notification-callbacks.js";
 import type { BetterAuthSessionResult } from "./auth/better-auth.js";
 
 type UiMode = "none" | "static" | "vite-dev";
@@ -89,6 +91,9 @@ export async function createApp(
   }
   app.use(llmRoutes(db));
 
+  // Telegram callback route — no company auth needed (comes from Telegram servers)
+  app.use("/api", notificationCallbackRoutes(db));
+
   // Mount API routes
   const api = Router();
   api.use(boardMutationGuard());
@@ -114,6 +119,7 @@ export async function createApp(
   api.use(dashboardRoutes(db));
   api.use(sidebarBadgeRoutes(db));
   api.use(metricsRoutes(db));
+  api.use(notificationRoutes(db));
   api.use(
     accessRoutes(db, {
       deploymentMode: opts.deploymentMode,

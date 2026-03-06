@@ -54,6 +54,49 @@ function formatMessage(
   return html;
 }
 
+/* ------------------------------------------------------------------ */
+/*  Inline keyboard builders (Telegram only)                          */
+/* ------------------------------------------------------------------ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type InlineKeyboard = { inline_keyboard: Array<Array<{ text: string; callback_data: string }>> };
+
+function buildInlineKeyboard(
+  eventType: string,
+  payload: Record<string, unknown>,
+): InlineKeyboard | undefined {
+  switch (eventType) {
+    case "task.failed":
+      return {
+        inline_keyboard: [[
+          { text: "Retry", callback_data: `action:retry:${payload.issueId}` },
+          { text: "Pause Agent", callback_data: `action:pause_agent:${payload.agentId}` },
+        ]],
+      };
+    case "agent.review_pending":
+      return {
+        inline_keyboard: [[
+          { text: "Approve", callback_data: `action:approve:${payload.issueId}` },
+          { text: "Reject", callback_data: `action:reject:${payload.issueId}` },
+        ]],
+      };
+    case "agent.budget_warning":
+      return {
+        inline_keyboard: [[
+          { text: "Pause Agent", callback_data: `action:pause_agent:${payload.agentId}` },
+        ]],
+      };
+    case "agent.circuit_breaker":
+      return {
+        inline_keyboard: [[
+          { text: "Resume Agent", callback_data: `action:resume_agent:${payload.agentId}` },
+        ]],
+      };
+    default:
+      return undefined;
+  }
+}
+
 /** Check if a rule's filter matches the payload */
 function matchesFilter(
   filter: Record<string, unknown> | null,
@@ -122,12 +165,14 @@ export function notificationService(db: Db) {
             switch (channel.channelType) {
               case "telegram": {
                 const text = formatMessage("telegram", eventType, payload);
+                const replyMarkup = buildInlineKeyboard(eventType, payload);
                 await sendTelegram(
                   {
                     botToken: config.botToken as string,
                     chatId: config.chatId as string,
                   },
                   text,
+                  replyMarkup ? { replyMarkup } : undefined,
                 );
                 break;
               }
