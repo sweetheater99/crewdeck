@@ -10,6 +10,7 @@ import {
   Network,
   Settings,
   ClipboardCheck,
+  BarChart3,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { SidebarSection } from "./SidebarSection";
@@ -104,6 +105,7 @@ export function Sidebar() {
 
         <SidebarSection label="Project">
           <SidebarNavItem to="/org" label="Org" icon={Network} />
+          <SidebarNavItem to="/metrics" label="Metrics" icon={BarChart3} />
           <SidebarNavItem to="/costs" label="Costs" icon={DollarSign} />
           <SidebarNavItem to="/activity" label="Activity" icon={History} />
           <SidebarNavItem to="/company/settings" label="Settings" icon={Settings} />

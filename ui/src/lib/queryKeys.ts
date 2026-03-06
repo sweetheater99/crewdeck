@@ -70,4 +70,10 @@ export const queryKeys = {
   runIssues: (runId: string) => ["run-issues", runId] as const,
   org: (companyId: string) => ["org", companyId] as const,
   reviewQueue: (companyId: string) => ["review-queue", companyId] as const,
+  metrics: {
+    overview: (companyId: string) => ["metrics", "overview", companyId] as const,
+    agents: (companyId: string) => ["metrics", "agents", companyId] as const,
+    trends: (companyId: string, period: string) =>
+      ["metrics", "trends", companyId, period] as const,
+  },
 };
