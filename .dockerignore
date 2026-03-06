@@ -2,9 +2,13 @@
 .github
 .crewdeck
 .pnpm-store
+.env*
 node_modules
 **/node_modules
 coverage
 data
 tmp
+dist/
+docs/
 *.log
+*.md

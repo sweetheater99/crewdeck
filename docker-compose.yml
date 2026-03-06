@@ -10,16 +10,21 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  server:
+  crewdeck:
     build: .
     ports:
       - "3100:3100"
     environment:
       DATABASE_URL: postgres://crewdeck:crewdeck@db:5432/crewdeck
+      HOST: "0.0.0.0"
       PORT: "3100"
       SERVE_UI: "true"
     depends_on:
       - db
+    volumes:
+      - crewdeck-data:/crewdeck
+    restart: unless-stopped
 
 volumes:
   pgdata:
+  crewdeck-data:

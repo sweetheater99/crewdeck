@@ -1,8 +1,6 @@
 services:
   crewdeck:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - "${CREWDECK_PORT:-3100}:3100"
     environment:
@@ -11,4 +9,8 @@ services:
       OPENAI_API_KEY: "${OPENAI_API_KEY:-}"
       ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
     volumes:
-      - "${CREWDECK_DATA_DIR:-./data/docker-crewdeck}:/crewdeck"
+      - crewdeck-data:/crewdeck
+    restart: unless-stopped
+
+volumes:
+  crewdeck-data:

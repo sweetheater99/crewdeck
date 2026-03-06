@@ -1,8 +1,9 @@
+# Stage 1 - Install dependencies
 FROM node:20-bookworm-slim AS base
 RUN apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates curl git \
   && rm -rf /var/lib/apt/lists/*
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 FROM base AS deps
 WORKDIR /app
@@ -17,17 +18,24 @@ COPY packages/adapters/claude-local/package.json packages/adapters/claude-local/
 COPY packages/adapters/codex-local/package.json packages/adapters/codex-local/
 RUN pnpm install --frozen-lockfile
 
+# Stage 2 - Build
 FROM base AS build
 WORKDIR /app
 COPY --from=deps /app /app
 COPY . .
+RUN pnpm --filter @crewdeck/shared build
+RUN pnpm --filter @crewdeck/db build
 RUN pnpm --filter @crewdeck/ui build
 RUN pnpm --filter @crewdeck/server build
 
-FROM base AS production
+# Stage 3 - Production
+FROM node:20-bookworm-slim AS production
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl postgresql postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+
 COPY --from=build /app /app
-RUN npm install --global --omit=dev @anthropic-ai/claude-code@latest @openai/codex@latest
 
 ENV NODE_ENV=production \
   HOME=/crewdeck \
@@ -42,5 +50,8 @@ ENV NODE_ENV=production \
 
 VOLUME ["/crewdeck"]
 EXPOSE 3100
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3100/api/health || exit 1
 
 CMD ["node", "--import", "./server/node_modules/tsx/dist/loader.mjs", "server/dist/index.js"]
