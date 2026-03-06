@@ -231,6 +231,10 @@ export {
   type CompanyPortabilityExport,
   type CompanyPortabilityPreview,
   type CompanyPortabilityImport,
+  createKnowledgeEntrySchema,
+  updateKnowledgeEntrySchema,
+  type CreateKnowledgeEntry,
+  type UpdateKnowledgeEntry,
 } from "./validators/index.js";
 
 export { API_PREFIX, API } from "./api.js";

@@ -22,3 +22,4 @@ export { createStorageServiceFromConfig, getStorageService } from "../storage/in
 export { notificationService } from "./notifications.js";
 export { digestService } from "./digest.js";
 export { messageService } from "./messages.js";
+export { knowledgeService } from "./knowledge.js";

@@ -120,6 +120,13 @@ export {
 } from "./asset.js";
 
 export {
+  createKnowledgeEntrySchema,
+  updateKnowledgeEntrySchema,
+  type CreateKnowledgeEntry,
+  type UpdateKnowledgeEntry,
+} from "./knowledge.js";
+
+export {
   createCompanyInviteSchema,
   acceptInviteSchema,
   listJoinRequestsQuerySchema,

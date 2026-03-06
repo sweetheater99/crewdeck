@@ -28,6 +28,7 @@ import { metricsRoutes } from "./routes/metrics.js";
 import { notificationRoutes } from "./routes/notifications.js";
 import { notificationCallbackRoutes } from "./routes/notification-callbacks.js";
 import { messageRoutes } from "./routes/messages.js";
+import { knowledgeRoutes } from "./routes/knowledge.js";
 import type { BetterAuthSessionResult } from "./auth/better-auth.js";
 
 type UiMode = "none" | "static" | "vite-dev";
@@ -122,6 +123,7 @@ export async function createApp(
   api.use(metricsRoutes(db));
   api.use(notificationRoutes(db));
   api.use(messageRoutes(db));
+  api.use(knowledgeRoutes(db));
   api.use(
     accessRoutes(db, {
       deploymentMode: opts.deploymentMode,

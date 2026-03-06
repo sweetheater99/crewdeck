@@ -1160,6 +1160,26 @@ export function heartbeatService(db: Db) {
     if (resolvedWorkspace.projectId && !readNonEmptyString(context.projectId)) {
       context.projectId = resolvedWorkspace.projectId;
     }
+
+    // Inject relevant knowledge entries into agent context
+    try {
+      const knowledgeSvc = (await import("./knowledge.js")).knowledgeService(db);
+      const knowledgeContext = await knowledgeSvc.getForContext(
+        agent.companyId,
+        resolvedWorkspace.projectId,
+      );
+      if (knowledgeContext.length > 0) {
+        context.crewdeckKnowledge = knowledgeContext.map((e) => ({
+          id: e.id,
+          title: e.title,
+          content: e.content,
+          tags: e.tags,
+        }));
+      }
+    } catch (knowledgeErr) {
+      logger.warn({ err: knowledgeErr }, "failed to load knowledge context for run");
+    }
+
     const runtimeSessionFallback = taskKey || resetTaskSession ? null : runtime.sessionId;
     const previousSessionDisplayId = truncateDisplayId(
       taskSessionForRun?.sessionDisplayId ??
