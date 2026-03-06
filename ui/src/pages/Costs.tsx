@@ -87,7 +87,7 @@ export function Costs() {
   });
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={DollarSign} message="Select a company to view costs." />;
+    return <EmptyState icon={DollarSign} message="Select a project to view costs." />;
   }
 
   if (isLoading) {

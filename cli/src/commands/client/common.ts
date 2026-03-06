@@ -34,7 +34,7 @@ export function addCommonClientOptions(command: Command, opts?: { includeCompany
     .option("--json", "Output raw JSON");
 
   if (opts?.includeCompany) {
-    command.option("-C, --company-id <id>", "Company ID (overrides context default)");
+    command.option("-C, --company-id <id>", "Project ID (overrides context default)");
   }
 
   return command;
@@ -65,7 +65,7 @@ export function resolveCommandContext(
 
   if (opts?.requireCompany && !companyId) {
     throw new Error(
-      "Company ID is required. Pass --company-id, set CREWDECK_COMPANY_ID, or set context profile companyId via `crewdeck context set`.",
+      "Project ID is required. Pass --company-id, set CREWDECK_COMPANY_ID, or set context profile companyId via `crewdeck context set`.",
     );
   }
 

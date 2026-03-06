@@ -29,7 +29,7 @@ export function Projects() {
   });
 
   if (!selectedCompanyId) {
-    return <EmptyState icon={Hexagon} message="Select a company to view projects." />;
+    return <EmptyState icon={Hexagon} message="Select a project to view projects." />;
   }
 
   if (isLoading) {

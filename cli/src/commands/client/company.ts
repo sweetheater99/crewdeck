@@ -134,7 +134,7 @@ export function resolveCompanyForDeletion(
 ): Company {
   const selector = normalizeSelector(selectorRaw);
   if (!selector) {
-    throw new Error("Company selector is required.");
+    throw new Error("Project selector is required.");
   }
 
   const idMatch = companies.find((company) => company.id === selector);
@@ -142,14 +142,14 @@ export function resolveCompanyForDeletion(
 
   if (by === "id") {
     if (!idMatch) {
-      throw new Error(`No company found by ID '${selector}'.`);
+      throw new Error(`No project found by ID '${selector}'.`);
     }
     return idMatch;
   }
 
   if (by === "prefix") {
     if (!prefixMatch) {
-      throw new Error(`No company found by shortname/prefix '${selector}'.`);
+      throw new Error(`No project found by shortname/prefix '${selector}'.`);
     }
     return prefixMatch;
   }
@@ -164,7 +164,7 @@ export function resolveCompanyForDeletion(
   if (prefixMatch) return prefixMatch;
 
   throw new Error(
-    `No company found for selector '${selector}'. Use company ID or issue prefix (for example PAP).`,
+    `No project found for selector '${selector}'. Use project ID or issue prefix (for example PAP).`,
   );
 }
 
@@ -176,7 +176,7 @@ export function assertDeleteConfirmation(company: Company, opts: CompanyDeleteOp
   const confirm = opts.confirm?.trim();
   if (!confirm) {
     throw new Error(
-      "Deletion requires --confirm <value> where value matches the company ID or issue prefix.",
+      "Deletion requires --confirm <value> where value matches the project ID or issue prefix.",
     );
   }
 
@@ -184,7 +184,7 @@ export function assertDeleteConfirmation(company: Company, opts: CompanyDeleteOp
   const confirmsByPrefix = confirm.toUpperCase() === company.issuePrefix.toUpperCase();
   if (!confirmsById && !confirmsByPrefix) {
     throw new Error(
-      `Confirmation '${confirm}' does not match target company. Expected ID '${company.id}' or prefix '${company.issuePrefix}'.`,
+      `Confirmation '${confirm}' does not match target project. Expected ID '${company.id}' or prefix '${company.issuePrefix}'.`,
     );
   }
 }
@@ -195,18 +195,18 @@ function assertDeleteFlags(opts: CompanyDeleteOptions): void {
   }
   if (!opts.confirm?.trim()) {
     throw new Error(
-      "Deletion requires --confirm <value> where value matches the company ID or issue prefix.",
+      "Deletion requires --confirm <value> where value matches the project ID or issue prefix.",
     );
   }
 }
 
 export function registerCompanyCommands(program: Command): void {
-  const company = program.command("company").description("Company operations");
+  const company = program.command("company").description("Project operations");
 
   addCommonClientOptions(
     company
       .command("list")
-      .description("List companies")
+      .description("List projects")
       .action(async (opts: CompanyCommandOptions) => {
         try {
           const ctx = resolveCommandContext(opts);
@@ -241,8 +241,8 @@ export function registerCompanyCommands(program: Command): void {
   addCommonClientOptions(
     company
       .command("get")
-      .description("Get one company")
-      .argument("<companyId>", "Company ID")
+      .description("Get one project")
+      .argument("<companyId>", "Project ID")
       .action(async (companyId: string, opts: CompanyCommandOptions) => {
         try {
           const ctx = resolveCommandContext(opts);
@@ -257,8 +257,8 @@ export function registerCompanyCommands(program: Command): void {
   addCommonClientOptions(
     company
       .command("export")
-      .description("Export a company into portable manifest + markdown files")
-      .argument("<companyId>", "Company ID")
+      .description("Export a project into portable manifest + markdown files")
+      .argument("<companyId>", "Project ID")
       .requiredOption("--out <path>", "Output directory")
       .option("--include <values>", "Comma-separated include set: company,agents", "company,agents")
       .action(async (companyId: string, opts: CompanyExportOptions) => {
@@ -296,11 +296,11 @@ export function registerCompanyCommands(program: Command): void {
   addCommonClientOptions(
     company
       .command("import")
-      .description("Import a portable company package from local path, URL, or GitHub")
+      .description("Import a portable project package from local path, URL, or GitHub")
       .requiredOption("--from <pathOrUrl>", "Source path or URL")
       .option("--include <values>", "Comma-separated include set: company,agents", "company,agents")
       .option("--target <mode>", "Target mode: new | existing")
-      .option("-C, --company-id <id>", "Existing target company ID")
+      .option("-C, --company-id <id>", "Existing target project ID")
       .option("--new-company-name <name>", "Name override for --target new")
       .option("--agents <list>", "Comma-separated agent slugs to import, or all", "all")
       .option("--collision <mode>", "Collision strategy: rename | skip | replace", "rename")
@@ -339,7 +339,7 @@ export function registerCompanyCommands(program: Command): void {
                 };
 
           if (targetPayload.mode === "existing_company" && !targetPayload.companyId) {
-            throw new Error("Target existing company requires --company-id (or context default companyId).");
+            throw new Error("Target existing project requires --company-id (or context default companyId).");
           }
 
           let sourcePayload:
@@ -388,8 +388,8 @@ export function registerCompanyCommands(program: Command): void {
   addCommonClientOptions(
     company
       .command("delete")
-      .description("Delete a company by ID or shortname/prefix (destructive)")
-      .argument("<selector>", "Company ID or issue prefix (for example PAP)")
+      .description("Delete a project by ID or shortname/prefix (destructive)")
+      .argument("<selector>", "Project ID or issue prefix (for example PAP)")
       .option(
         "--by <mode>",
         "Selector mode: auto | id | prefix",
@@ -398,7 +398,7 @@ export function registerCompanyCommands(program: Command): void {
       .option("--yes", "Required safety flag to confirm destructive action", false)
       .option(
         "--confirm <value>",
-        "Required safety value: target company ID or shortname/prefix",
+        "Required safety value: target project ID or shortname/prefix",
       )
       .action(async (selector: string, opts: CompanyDeleteOptions) => {
         try {
@@ -418,7 +418,7 @@ export function registerCompanyCommands(program: Command): void {
             if (byId) {
               target = byId;
             } else if (by === "id") {
-              throw new Error(`No company found by ID '${normalizedSelector}'.`);
+              throw new Error(`No project found by ID '${normalizedSelector}'.`);
             }
           }
 
@@ -440,7 +440,7 @@ export function registerCompanyCommands(program: Command): void {
             } catch (error) {
               if (error instanceof ApiRequestError && error.status === 403 && error.message.includes("Board access required")) {
                 throw new Error(
-                  "Board access is required to resolve companies across the instance. Use a company ID/prefix for your current company, or run with board authentication.",
+                  "Board access is required to resolve projects across the instance. Use a project ID/prefix for your current project, or run with board authentication.",
                 );
               }
               throw error;
@@ -448,7 +448,7 @@ export function registerCompanyCommands(program: Command): void {
           }
 
           if (!target) {
-            throw new Error(`No company found for selector '${normalizedSelector}'.`);
+            throw new Error(`No project found for selector '${normalizedSelector}'.`);
           }
 
           assertDeleteConfirmation(target, opts);

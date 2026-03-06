@@ -9,7 +9,7 @@ const CREWDECK_ART = [
   "╚═╝     ╚═╝  ╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝ ╚═════╝╚══════╝╚═╝╚═╝     ",
 ] as const;
 
-const TAGLINE = "Open-source orchestration for zero-human companies";
+const TAGLINE = "Open-source orchestration for zero-human projects";
 
 export function printCrewdeckCliBanner(): void {
   const lines = [

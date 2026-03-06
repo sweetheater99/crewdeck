@@ -19,8 +19,8 @@ export function registerAgentCommands(program: Command): void {
   addCommonClientOptions(
     agent
       .command("list")
-      .description("List agents for a company")
-      .requiredOption("-C, --company-id <id>", "Company ID")
+      .description("List agents for a project")
+      .requiredOption("-C, --company-id <id>", "Project ID")
       .action(async (opts: AgentListOptions) => {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });

@@ -53,7 +53,7 @@ export function Sidebar() {
           />
         )}
         <span className="flex-1 text-sm font-bold text-foreground truncate pl-1">
-          {selectedCompany?.name ?? "Select company"}
+          {selectedCompany?.name ?? "Select project"}
         </span>
         <Button
           variant="ghost"
@@ -95,7 +95,7 @@ export function Sidebar() {
 
         <SidebarAgents />
 
-        <SidebarSection label="Company">
+        <SidebarSection label="Project">
           <SidebarNavItem to="/org" label="Org" icon={Network} />
           <SidebarNavItem to="/costs" label="Costs" icon={DollarSign} />
           <SidebarNavItem to="/activity" label="Activity" icon={History} />

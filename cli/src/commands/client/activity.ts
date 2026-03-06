@@ -22,8 +22,8 @@ export function registerActivityCommands(program: Command): void {
   addCommonClientOptions(
     activity
       .command("list")
-      .description("List company activity log entries")
-      .requiredOption("-C, --company-id <id>", "Company ID")
+      .description("List project activity log entries")
+      .requiredOption("-C, --company-id <id>", "Project ID")
       .option("--agent-id <id>", "Filter by agent ID")
       .option("--entity-type <type>", "Filter by entity type")
       .option("--entity-id <id>", "Filter by entity ID")

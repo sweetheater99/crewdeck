@@ -18,8 +18,8 @@ export function registerDashboardCommands(program: Command): void {
   addCommonClientOptions(
     dashboard
       .command("get")
-      .description("Get dashboard summary for a company")
-      .requiredOption("-C, --company-id <id>", "Company ID")
+      .description("Get dashboard summary for a project")
+      .requiredOption("-C, --company-id <id>", "Project ID")
       .action(async (opts: DashboardGetOptions) => {
         try {
           const ctx = resolveCommandContext(opts, { requireCompany: true });

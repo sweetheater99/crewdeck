@@ -35,8 +35,8 @@ const ACTION_VERBS: Record<string, string> = {
   "goal.deleted": "deleted",
   "cost.reported": "reported cost for",
   "cost.recorded": "recorded cost for",
-  "company.created": "created company",
-  "company.updated": "updated company",
+  "company.created": "created project",
+  "company.updated": "updated project",
   "company.archived": "archived",
   "company.budget_updated": "updated budget for",
 };

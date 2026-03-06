@@ -67,8 +67,8 @@ export function registerIssueCommands(program: Command): void {
   addCommonClientOptions(
     issue
       .command("list")
-      .description("List issues for a company")
-      .option("-C, --company-id <id>", "Company ID")
+      .description("List issues for a project")
+      .option("-C, --company-id <id>", "Project ID")
       .option("--status <csv>", "Comma-separated statuses")
       .option("--assignee-agent-id <id>", "Filter by assignee agent ID")
       .option("--project-id <id>", "Filter by project ID")
@@ -136,7 +136,7 @@ export function registerIssueCommands(program: Command): void {
     issue
       .command("create")
       .description("Create an issue")
-      .requiredOption("-C, --company-id <id>", "Company ID")
+      .requiredOption("-C, --company-id <id>", "Project ID")
       .requiredOption("--title <title>", "Issue title")
       .option("--description <text>", "Issue description")
       .option("--status <status>", "Issue status")

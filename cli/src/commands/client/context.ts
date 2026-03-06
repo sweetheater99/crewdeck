@@ -83,7 +83,7 @@ export function registerContextCommands(program: Command): void {
     .option("--context <path>", "Path to CLI context file")
     .option("--profile <name>", "Profile name (default: current profile)")
     .option("--api-base <url>", "Default API base URL")
-    .option("--company-id <id>", "Default company ID")
+    .option("--company-id <id>", "Default project ID")
     .option("--api-key-env-var-name <name>", "Env var containing API key (recommended)")
     .option("--use", "Set this profile as active")
     .option("--json", "Output raw JSON")
