@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crewdeck - Autopilot for Solo AI Companies</title>
+  <meta name="description" content="Your agents work while you sleep. Wake up to results. Open-source task orchestration for AI agent teams.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .terminal-cursor { animation: blink 1.2s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            zinc: {
+              950: '#09090b',
+              900: '#18181b',
+              800: '#27272a',
+              700: '#3f3f46',
+              600: '#52525b',
+              400: '#a1a1aa',
+              300: '#d4d4d8',
+              200: '#e4e4e7',
+              100: '#f4f4f5',
+            },
+            emerald: {
+              500: '#10b981',
+              600: '#059669',
+              400: '#34d399',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased">
+
+  <!-- Hero -->
+  <section class="min-h-[85vh] flex items-center justify-center px-6">
+    <div class="max-w-3xl text-center">
+      <h1 class="text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tight mb-6">
+        Crewdeck
+      </h1>
+      <p class="text-xl sm:text-2xl md:text-3xl text-emerald-400 font-semibold mb-4">
+        Autopilot for solo AI companies
+      </p>
+      <p class="text-lg sm:text-xl text-zinc-400 mb-10 max-w-xl mx-auto">
+        Your agents work while you sleep. Wake up to results.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="https://github.com/crewdeck/crewdeck" class="inline-flex items-center justify-center px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-semibold rounded-lg transition-colors text-lg">
+          Get Started
+        </a>
+        <a href="../" class="inline-flex items-center justify-center px-8 py-3.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-semibold rounded-lg transition-colors text-lg border border-zinc-700">
+          View Docs
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem / Solution -->
+  <section class="px-6 py-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 md:gap-12">
+      <!-- Without -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8">
+        <h2 class="text-xl font-bold text-red-400 mb-6">Without Crewdeck</h2>
+        <ul class="space-y-4 text-zinc-400">
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-0.5 shrink-0">&#x2717;</span>
+            <span>Babysitting agents in terminal tabs, copy-pasting outputs between them</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-0.5 shrink-0">&#x2717;</span>
+            <span>One failure kills the chain &mdash; you don't notice until hours later</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-0.5 shrink-0">&#x2717;</span>
+            <span>No idea what anything costs until the invoice arrives</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-red-400 mt-0.5 shrink-0">&#x2717;</span>
+            <span>Context switching between dashboards, logs, and chat windows</span>
+          </li>
+        </ul>
+      </div>
+      <!-- With -->
+      <div class="bg-zinc-900 border border-emerald-500/30 rounded-2xl p-8">
+        <h2 class="text-xl font-bold text-emerald-400 mb-6">With Crewdeck</h2>
+        <ul class="space-y-4 text-zinc-300">
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 mt-0.5 shrink-0">&#x2713;</span>
+            <span>Define task chains with dependencies &mdash; agents hand off automatically</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 mt-0.5 shrink-0">&#x2713;</span>
+            <span>Failures retry, reassign, or escalate to you &mdash; nothing silently dies</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 mt-0.5 shrink-0">&#x2713;</span>
+            <span>Real-time cost tracking per agent, per task, per day</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="text-emerald-400 mt-0.5 shrink-0">&#x2713;</span>
+            <span>One dashboard. Morning digest on Telegram. Act from your phone.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="px-6 py-24">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center mb-4">Everything you need</h2>
+      <p class="text-zinc-400 text-center mb-16 text-lg">Six features. Zero fluff.</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x1f517;</div>
+          <h3 class="text-lg font-semibold mb-2">Task Dependencies</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Chain tasks. Agents auto-start when blockers resolve.</p>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x1f6e1;</div>
+          <h3 class="text-lg font-semibold mb-2">Smart Failure Handling</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Retry, reassign, escalate. No wasted tokens.</p>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x2705;</div>
+          <h3 class="text-lg font-semibold mb-2">Review Gates</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">New agents need approval. Proven agents run free.</p>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x1f514;</div>
+          <h3 class="text-lg font-semibold mb-2">Notifications</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Telegram, Discord, webhooks. Act from your phone.</p>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x2600;</div>
+          <h3 class="text-lg font-semibold mb-2">Daily Digest</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">One message every morning. Everything that happened.</p>
+        </div>
+
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors">
+          <div class="text-2xl mb-3">&#x1f4ca;</div>
+          <h3 class="text-lg font-semibold mb-2">Performance Metrics</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Who's productive. Who's stuck. What it costs.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="px-6 py-24">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-3xl sm:text-4xl font-bold text-center mb-16">Three steps. That's it.</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
+            <span class="text-emerald-400 font-bold text-xl">1</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Add your agents</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Claude Code, Codex, OpenClaw, any runtime. Register them once.</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
+            <span class="text-emerald-400 font-bold text-xl">2</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Create tasks with dependencies</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Define the work chain. Set blockers, priorities, and failure policies.</p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5">
+            <span class="text-emerald-400 font-bold text-xl">3</span>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Step away</h3>
+          <p class="text-zinc-400 text-sm leading-relaxed">Agents execute, retry on failure, and notify you. Go live your life.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Terminal -->
+  <section class="px-6 py-24">
+    <div class="max-w-2xl mx-auto">
+      <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+        <div class="flex items-center gap-2 px-4 py-3 bg-zinc-800/50 border-b border-zinc-800">
+          <span class="w-3 h-3 rounded-full bg-red-500/70"></span>
+          <span class="w-3 h-3 rounded-full bg-yellow-500/70"></span>
+          <span class="w-3 h-3 rounded-full bg-green-500/70"></span>
+          <span class="text-zinc-500 text-xs font-mono ml-2">terminal</span>
+        </div>
+        <div class="p-6 font-mono text-sm leading-relaxed">
+          <div class="text-zinc-400">
+            <span class="text-emerald-400">$</span> docker run -p 3100:3100 crewdeck/crewdeck
+          </div>
+          <div class="mt-3 text-zinc-300">
+            Crewdeck running at <span class="text-emerald-400">http://localhost:3100</span>
+          </div>
+          <div class="mt-3">
+            <span class="text-emerald-400">$</span> <span class="terminal-cursor text-zinc-400">&#x2588;</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="px-6 py-16 border-t border-zinc-800">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="text-zinc-500 text-sm">
+        Open source under MIT
+      </div>
+      <div class="flex items-center gap-8">
+        <a href="https://github.com/crewdeck/crewdeck" class="text-zinc-400 hover:text-zinc-100 text-sm transition-colors">GitHub</a>
+        <a href="../" class="text-zinc-400 hover:text-zinc-100 text-sm transition-colors">Docs</a>
+        <a href="https://discord.gg/crewdeck" class="text-zinc-400 hover:text-zinc-100 text-sm transition-colors">Discord</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
