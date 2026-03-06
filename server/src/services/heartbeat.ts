@@ -1416,6 +1416,14 @@ export function heartbeatService(db: Db) {
       }
       await finalizeAgentStatus(agent.id, outcome);
 
+      // --- Review gate: if agent requires review, hold the issue before marking done ---
+      if (outcome === "succeeded" && agent.requiresReview && issueId) {
+        await db.update(issues)
+          .set({ reviewStatus: "pending_review", updatedAt: new Date() })
+          .where(eq(issues.id, issueId));
+        logger.info({ agentId: agent.id, issueId }, "Task pending review");
+      }
+
       // --- Failure escalation / success reset ---
       if (outcome === "succeeded") {
         if (agent.consecutiveFailures > 0) {

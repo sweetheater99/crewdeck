@@ -38,6 +38,7 @@ export const createAgentSchema = z.object({
   permissions: agentPermissionsSchema.optional(),
   retryPolicy: z.object({ maxRetries: z.number().int().nonnegative(), backoffSec: z.number().int().nonnegative() }).optional().nullable(),
   fallbackAgentId: z.string().uuid().optional().nullable(),
+  requiresReview: z.boolean().optional(),
   metadata: z.record(z.unknown()).optional().nullable(),
 });
 

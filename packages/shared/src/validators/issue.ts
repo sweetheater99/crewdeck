@@ -66,3 +66,10 @@ export const createIssueAttachmentMetadataSchema = z.object({
 });
 
 export type CreateIssueAttachmentMetadata = z.infer<typeof createIssueAttachmentMetadataSchema>;
+
+export const reviewIssueSchema = z.object({
+  action: z.enum(["approve", "reject"]),
+  feedback: z.string().optional(),
+});
+
+export type ReviewIssue = z.infer<typeof reviewIssueSchema>;

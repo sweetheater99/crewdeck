@@ -6,6 +6,7 @@ import {
   integer,
   timestamp,
   jsonb,
+  boolean,
   index,
 } from "drizzle-orm/pg-core";
 import { companies } from "./companies.js";
@@ -32,6 +33,7 @@ export const agents = pgTable(
     retryPolicy: jsonb("retry_policy").$type<{ maxRetries: number; backoffSec: number }>().default({ maxRetries: 3, backoffSec: 300 }),
     consecutiveFailures: integer("consecutive_failures").notNull().default(0),
     fallbackAgentId: uuid("fallback_agent_id").references((): AnyPgColumn => agents.id),
+    requiresReview: boolean("requires_review").default(false).notNull(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

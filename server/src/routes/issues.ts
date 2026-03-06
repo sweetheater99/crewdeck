@@ -1,6 +1,8 @@
 import { Router, type Request, type Response } from "express";
 import multer from "multer";
 import type { Db } from "@crewdeck/db";
+import { issues } from "@crewdeck/db";
+import { eq } from "drizzle-orm";
 import {
   addIssueCommentSchema,
   createIssueAttachmentMetadataSchema,
@@ -8,6 +10,7 @@ import {
   checkoutIssueSchema,
   createIssueSchema,
   linkIssueApprovalSchema,
+  reviewIssueSchema,
   updateIssueSchema,
 } from "@crewdeck/shared";
 import type { StorageService } from "../storage/types.js";
@@ -1197,6 +1200,105 @@ export function issueRoutes(db: Db, storage: StorageService) {
       details: { dependsOnId },
     });
     res.json({ ok: true });
+  });
+
+  // --- Review gate: approve or reject a pending review ---
+  router.post("/companies/:companyId/issues/:issueId/review", validate(reviewIssueSchema), async (req, res) => {
+    const companyId = req.params.companyId as string;
+    const issueId = req.params.issueId as string;
+    assertCompanyAccess(req, companyId);
+
+    const issue = await svc.getById(issueId);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.companyId !== companyId) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    if (issue.reviewStatus !== "pending_review") {
+      res.status(400).json({ error: "Issue is not pending review" });
+      return;
+    }
+
+    const { action, feedback } = req.body as { action: "approve" | "reject"; feedback?: string };
+    const actor = getActorInfo(req);
+
+    if (action === "approve") {
+      // Set reviewStatus = approved, then mark issue as done
+      await db.update(issues)
+        .set({ reviewStatus: "approved", updatedAt: new Date() })
+        .where(eq(issues.id, issueId));
+
+      const updated = await svc.update(issueId, { status: "done" as any });
+
+      await logActivity(db, {
+        companyId,
+        actorType: actor.actorType,
+        actorId: actor.actorId,
+        agentId: actor.agentId,
+        runId: actor.runId,
+        action: "issue.review_approved",
+        entityType: "issue",
+        entityId: issueId,
+        details: { feedback },
+      });
+
+      // Unblock downstream dependencies
+      void depsSvc
+        .onIssueCompleted(companyId, issueId)
+        .catch((err) => logger.warn({ err, issueId }, "failed to recalculate dependents on review approval"));
+
+      res.json(updated);
+    } else {
+      // Reject: set reviewStatus, add feedback comment, re-wake agent
+      await db.update(issues)
+        .set({ reviewStatus: "rejected", updatedAt: new Date() })
+        .where(eq(issues.id, issueId));
+
+      if (feedback) {
+        await svc.addComment(issueId, `**Review rejected:** ${feedback}`, {
+          userId: actor.actorType === "user" ? actor.actorId : undefined,
+        });
+      }
+
+      await logActivity(db, {
+        companyId,
+        actorType: actor.actorType,
+        actorId: actor.actorId,
+        agentId: actor.agentId,
+        runId: actor.runId,
+        action: "issue.review_rejected",
+        entityType: "issue",
+        entityId: issueId,
+        details: { feedback },
+      });
+
+      // Re-wake the assigned agent with rejection context
+      if (issue.assigneeAgentId) {
+        void heartbeat
+          .wakeup(issue.assigneeAgentId, {
+            source: "automation",
+            triggerDetail: "callback",
+            reason: "review_rejected",
+            requestedByActorType: actor.actorType === "user" ? "user" : "system",
+            requestedByActorId: actor.actorId,
+            contextSnapshot: {
+              issueId,
+              wakeReason: "review_rejected",
+              wakeSource: "automation",
+              rejectionFeedback: feedback ?? null,
+            },
+          })
+          .catch((err) =>
+            logger.warn({ err, issueId, agentId: issue.assigneeAgentId }, "failed to wake agent on review rejection"),
+          );
+      }
+
+      const updated = await svc.getById(issueId);
+      res.json(updated);
+    }
   });
 
   router.get("/companies/:companyId/issues/:issueId/dependents", async (req, res) => {

@@ -27,6 +27,7 @@ export interface Agent {
   permissions: AgentPermissions;
   retryPolicy: { maxRetries: number; backoffSec: number } | null;
   consecutiveFailures: number;
+  requiresReview: boolean;
   fallbackAgentId: string | null;
   lastHeartbeatAt: Date | null;
   metadata: Record<string, unknown> | null;

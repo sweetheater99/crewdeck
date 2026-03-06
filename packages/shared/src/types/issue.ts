@@ -76,6 +76,7 @@ export interface Issue {
   startedAt: Date | null;
   completedAt: Date | null;
   cancelledAt: Date | null;
+  reviewStatus: "pending_review" | "approved" | "rejected" | null;
   hiddenAt: Date | null;
   labelIds?: string[];
   labels?: IssueLabel[];
