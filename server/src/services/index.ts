@@ -19,3 +19,4 @@ export { logActivity, type LogActivityInput } from "./activity-log.js";
 export { publishLiveEvent, subscribeCompanyLiveEvents } from "./live-events.js";
 export { metricsService, type MetricsDateRange } from "./metrics.js";
 export { createStorageServiceFromConfig, getStorageService } from "../storage/index.js";
+export { notificationService } from "./notifications.js";
