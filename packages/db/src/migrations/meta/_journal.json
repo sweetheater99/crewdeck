@@ -197,6 +197,13 @@
       "when": 1772800904209,
       "tag": "0027_natural_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1772802214608,
+      "tag": "0028_spicy_sleeper",
+      "breakpoints": true
     }
   ]
 }

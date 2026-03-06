@@ -76,3 +76,5 @@ export type {
   NotificationRule,
   NotificationEventType,
 } from "./notification.js";
+export type { AgentMessage } from "./agent-message.js";
+export type { KnowledgeEntry } from "./knowledge.js";

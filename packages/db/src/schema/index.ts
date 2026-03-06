@@ -33,3 +33,5 @@ export { companySecrets } from "./company_secrets.js";
 export { companySecretVersions } from "./company_secret_versions.js";
 export { notificationChannels } from "./notification_channels.js";
 export { notificationRules } from "./notification_rules.js";
+export { agentMessages } from "./agent_messages.js";
+export { knowledgeEntries } from "./knowledge_entries.js";
