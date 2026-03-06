@@ -176,6 +176,13 @@
       "when": 1772798946514,
       "tag": "0024_tan_hiroim",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1772799600911,
+      "tag": "0025_icy_forgotten_one",
+      "breakpoints": true
     }
   ]
 }

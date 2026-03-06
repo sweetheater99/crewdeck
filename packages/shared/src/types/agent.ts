@@ -25,6 +25,9 @@ export interface Agent {
   budgetMonthlyCents: number;
   spentMonthlyCents: number;
   permissions: AgentPermissions;
+  retryPolicy: { maxRetries: number; backoffSec: number } | null;
+  consecutiveFailures: number;
+  fallbackAgentId: string | null;
   lastHeartbeatAt: Date | null;
   metadata: Record<string, unknown> | null;
   createdAt: Date;
