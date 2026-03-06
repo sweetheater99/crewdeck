@@ -71,3 +71,8 @@ export type {
   CompanyPortabilityImportResult,
   CompanyPortabilityExportRequest,
 } from "./company-portability.js";
+export type {
+  NotificationChannel,
+  NotificationRule,
+  NotificationEventType,
+} from "./notification.js";

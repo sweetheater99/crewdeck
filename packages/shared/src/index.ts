@@ -121,6 +121,9 @@ export type {
   AgentEnvConfig,
   CompanySecret,
   SecretProviderDescriptor,
+  NotificationChannel,
+  NotificationRule,
+  NotificationEventType,
 } from "./types/index.js";
 
 export {
