@@ -1,183 +1,64 @@
 <p align="center">
-  <img src="doc/assets/header.png" alt="Crewdeck — runs your business" width="720" />
-</p>
-
-<p align="center">
-  <a href="#quickstart"><strong>Quickstart</strong></a> &middot;
-  <a href="https://crewdeck.ing/docs"><strong>Docs</strong></a> &middot;
-  <a href="https://github.com/crewdeck/crewdeck"><strong>GitHub</strong></a> &middot;
-  <a href="https://discord.gg/m4HZY7xNG3"><strong>Discord</strong></a>
+  <h1 align="center">Crewdeck</h1>
+  <p align="center"><strong>Autopilot for solo AI companies</strong></p>
+  <p align="center">Your agents work while you sleep. Wake up to results.</p>
 </p>
 
 <p align="center">
   <a href="https://github.com/crewdeck/crewdeck/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT License" /></a>
   <a href="https://github.com/crewdeck/crewdeck/stargazers"><img src="https://img.shields.io/github/stars/crewdeck/crewdeck?style=flat" alt="Stars" /></a>
-  <a href="https://discord.gg/m4HZY7xNG3"><img src="https://img.shields.io/discord/000000000?label=discord" alt="Discord" /></a>
 </p>
-
-<br/>
-
-<div align="center">
-  <video src="https://github.com/user-attachments/assets/773bdfb2-6d1e-4e30-8c5f-3487d5b70c8f" width="600" controls></video>
-</div>
-
-<br/>
 
 ## What is Crewdeck?
 
-# Open-source orchestration for zero-human companies
+A lightweight control plane for solo founders running AI agents. Set up your agents, define tasks and dependencies, set budgets -- then step away. Crewdeck orchestrates everything and sends you a morning summary of what happened.
 
-**If OpenClaw is an _employee_, Crewdeck is the _company_**
-
-Crewdeck is a Node.js server and React UI that orchestrates a team of AI agents to run a business. Bring your own agents, assign goals, and track your agents' work and costs from one dashboard.
-
-It looks like a task manager — but under the hood it has org charts, budgets, governance, goal alignment, and agent coordination.
-
-**Manage business goals, not pull requests.**
-
-|        | Step            | Example                                                            |
-| ------ | --------------- | ------------------------------------------------------------------ |
-| **01** | Define the goal | _"Build the #1 AI note-taking app to $1M MRR."_                    |
-| **02** | Hire the team   | CEO, CTO, engineers, designers, marketers — any bot, any provider. |
-| **03** | Approve and run | Review strategy. Set budgets. Hit go. Monitor from the dashboard.  |
-
-<br/>
-
-> **COMING SOON: Clipmart** — Download and run entire companies with one click. Browse pre-built company templates — full org structures, agent configs, and skills — and import them into your Crewdeck instance in seconds.
-
-<br/>
-
-<div align="center">
-<table>
-  <tr>
-    <td align="center"><strong>Works<br/>with</strong></td>
-    <td align="center"><img src="doc/assets/logos/openclaw.svg" width="32" alt="OpenClaw" /><br/><sub>OpenClaw</sub></td>
-    <td align="center"><img src="doc/assets/logos/claude.svg" width="32" alt="Claude" /><br/><sub>Claude Code</sub></td>
-    <td align="center"><img src="doc/assets/logos/codex.svg" width="32" alt="Codex" /><br/><sub>Codex</sub></td>
-    <td align="center"><img src="doc/assets/logos/cursor.svg" width="32" alt="Cursor" /><br/><sub>Cursor</sub></td>
-    <td align="center"><img src="doc/assets/logos/bash.svg" width="32" alt="Bash" /><br/><sub>Bash</sub></td>
-    <td align="center"><img src="doc/assets/logos/http.svg" width="32" alt="HTTP" /><br/><sub>HTTP</sub></td>
-  </tr>
-</table>
-
-<em>If it can receive a heartbeat, it's hired.</em>
-
-</div>
-
-<br/>
-
-## Crewdeck is right for you if
-
-- ✅ You want to build **autonomous AI companies**
-- ✅ You **coordinate many different agents** (OpenClaw, Codex, Claude, Cursor) toward a common goal
-- ✅ You have **20 simultaneous Claude Code terminals** open and lose track of what everyone is doing
-- ✅ You want agents running **autonomously 24/7**, but still want to audit work and chime in when needed
-- ✅ You want to **monitor costs** and enforce budgets
-- ✅ You want a process for managing agents that **feels like using a task manager**
-- ✅ You want to manage your autonomous businesses **from your phone**
-
-<br/>
+If you're a solo founder with 5-20 AI agents and you've lost track of what they're all doing -- Crewdeck is for you.
 
 ## Features
 
 <table>
 <tr>
 <td align="center" width="33%">
-<h3>🔌 Bring Your Own Agent</h3>
-Any agent, any runtime, one org chart. If it can receive a heartbeat, it's hired.
+<h3>Task Dependencies</h3>
+Chain tasks so agents auto-start when blockers resolve. "Build API" finishes, "Build UI" kicks off.
 </td>
 <td align="center" width="33%">
-<h3>🎯 Goal Alignment</h3>
-Every task traces back to the company mission. Agents know <em>what</em> to do and <em>why</em>.
+<h3>Smart Failure Handling</h3>
+Retry, reassign to a backup agent, or escalate to you. No silent failures at 3am.
 </td>
 <td align="center" width="33%">
-<h3>💓 Heartbeats</h3>
-Agents wake on a schedule, check work, and act. Delegation flows up and down the org chart.
+<h3>Review Gates</h3>
+Trust new agents less, proven agents more. Set approval requirements per agent or task type.
 </td>
 </tr>
 <tr>
 <td align="center">
-<h3>💰 Cost Control</h3>
-Monthly budgets per agent. When they hit the limit, they stop. No runaway costs.
+<h3>Notifications</h3>
+Telegram, Discord, webhooks. Get pinged when it matters. Act from your phone.
 </td>
 <td align="center">
-<h3>🏢 Multi-Company</h3>
-One deployment, many companies. Complete data isolation. One control plane for your portfolio.
+<h3>Daily Digest</h3>
+"Here's what happened overnight." One summary, every morning, no dashboard required.
 </td>
 <td align="center">
-<h3>🎫 Ticket System</h3>
-Every conversation traced. Every decision explained. Full tool-call tracing and immutable audit log.
-</td>
-</tr>
-<tr>
-<td align="center">
-<h3>🛡️ Governance</h3>
-You're the board. Approve hires, override strategy, pause or terminate any agent — at any time.
-</td>
-<td align="center">
-<h3>📊 Org Chart</h3>
-Hierarchies, roles, reporting lines. Your agents have a boss, a title, and a job description.
-</td>
-<td align="center">
-<h3>📱 Mobile Ready</h3>
-Monitor and manage your autonomous businesses from anywhere.
+<h3>Performance Metrics</h3>
+Who's productive, who's stuck, what it costs. Per-agent budgets so nothing runs away.
 </td>
 </tr>
 </table>
 
-<br/>
-
-## Problems Crewdeck solves
-
-| Without Crewdeck                                                                                                                     | With Crewdeck                                                                                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| ❌ You have 20 Claude Code tabs open and can't track which one does what. On reboot you lose everything.                              | ✅ Tasks are ticket-based, conversations are threaded, sessions persist across reboots.                                                |
-| ❌ You manually gather context from several places to remind your bot what you're actually doing.                                     | ✅ Context flows from the task up through the project and company goals — your agent always knows what to do and why.                  |
-| ❌ Folders of agent configs are disorganized and you're re-inventing task management, communication, and coordination between agents. | ✅ Crewdeck gives you org charts, ticketing, delegation, and governance out of the box — so you run a company, not a pile of scripts. |
-| ❌ Runaway loops waste hundreds of dollars of tokens and max your quota before you even know what happened.                           | ✅ Cost tracking surfaces token budgets and throttles agents when they're out. Management prioritizes with budgets.                    |
-| ❌ You have recurring jobs (customer support, social, reports) and have to remember to manually kick them off.                        | ✅ Heartbeats handle regular work on a schedule. Management supervises.                                                                |
-| ❌ You have an idea, you have to find your repo, fire up Claude Code, keep a tab open, and babysit it.                                | ✅ Add a task in Crewdeck. Your coding agent works on it until it's done. Management reviews their work.                              |
-
-<br/>
-
-## Why Crewdeck is special
-
-Crewdeck handles the hard orchestration details correctly.
-
-|                                   |                                                                                                               |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Atomic execution.**             | Task checkout and budget enforcement are atomic, so no double-work and no runaway spend.                      |
-| **Persistent agent state.**       | Agents resume the same task context across heartbeats instead of restarting from scratch.                     |
-| **Runtime skill injection.**      | Agents can learn Crewdeck workflows and project context at runtime, without retraining.                      |
-| **Governance with rollback.**     | Approval gates are enforced, config changes are revisioned, and bad changes can be rolled back safely.        |
-| **Goal-aware execution.**         | Tasks carry full goal ancestry so agents consistently see the "why," not just a title.                        |
-| **Portable company templates.**   | Export/import orgs, agents, and skills with secret scrubbing and collision handling.                          |
-| **True multi-company isolation.** | Every entity is company-scoped, so one deployment can run many companies with separate data and audit trails. |
-
-<br/>
-
-## What Crewdeck is not
-
-|                              |                                                                                                                      |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Not a chatbot.**           | Agents have jobs, not chat windows.                                                                                  |
-| **Not an agent framework.**  | We don't tell you how to build agents. We tell you how to run a company made of them.                                |
-| **Not a workflow builder.**  | No drag-and-drop pipelines. Crewdeck models companies — with org charts, goals, budgets, and governance.            |
-| **Not a prompt manager.**    | Agents bring their own prompts, models, and runtimes. Crewdeck manages the organization they work in.               |
-| **Not a single-agent tool.** | This is for teams. If you have one agent, you probably don't need Crewdeck. If you have twenty — you definitely do. |
-| **Not a code review tool.**  | Crewdeck orchestrates work, not pull requests. Bring your own review process.                                       |
-
-<br/>
+**Plus:** Inter-agent messaging, shared knowledge base, searchable run logs, mobile dashboard.
 
 ## Quickstart
 
-Open source. Self-hosted. No Crewdeck account required.
+### Docker (recommended)
 
 ```bash
-npx crewdeck onboard --yes
+docker run -p 3100:3100 -v crewdeck-data:/root/.crewdeck crewdeck/crewdeck
 ```
 
-Or manually:
+### From source
 
 ```bash
 git clone https://github.com/crewdeck/crewdeck.git
@@ -186,34 +67,42 @@ pnpm install
 pnpm dev
 ```
 
-This starts the API server at `http://localhost:3100`. An embedded PostgreSQL database is created automatically — no setup required.
+Open [http://localhost:3100](http://localhost:3100). An embedded PostgreSQL database is created automatically.
 
 > **Requirements:** Node.js 20+, pnpm 9.15+
 
-<br/>
+## How It Works
 
-## FAQ
+1. **Create a project** and add agents (Claude Code, Codex, OpenClaw, Cursor, anything with a heartbeat)
+2. **Create tasks with dependencies** -- "Build API" -> "Build UI" -> "Write tests"
+3. **Agents execute on heartbeat schedules.** Failures auto-retry or reassign to backup agents.
+4. **You get notified.** Telegram pings for urgent stuff, daily digest for everything else. Approve reviews from your phone.
 
-**What does a typical setup look like?**
-Locally, a single Node.js process manages an embedded Postgres and local file storage. For production, point it at your own Postgres and deploy however you like. Configure projects, agents, and goals — the agents take care of the rest.
+## Works With
 
-If you're a solo-entreprenuer you can use Tailscale to access Crewdeck on the go. Then later you can deploy to e.g. Vercel when you need it.
+<div align="center">
+<table>
+  <tr>
+    <td align="center"><img src="doc/assets/logos/claude.svg" width="32" alt="Claude" /><br/><sub>Claude Code</sub></td>
+    <td align="center"><img src="doc/assets/logos/codex.svg" width="32" alt="Codex" /><br/><sub>Codex</sub></td>
+    <td align="center"><img src="doc/assets/logos/openclaw.svg" width="32" alt="OpenClaw" /><br/><sub>OpenClaw</sub></td>
+    <td align="center"><img src="doc/assets/logos/cursor.svg" width="32" alt="Cursor" /><br/><sub>Cursor</sub></td>
+    <td align="center"><img src="doc/assets/logos/bash.svg" width="32" alt="Bash" /><br/><sub>Bash</sub></td>
+    <td align="center"><img src="doc/assets/logos/http.svg" width="32" alt="HTTP" /><br/><sub>HTTP</sub></td>
+  </tr>
+</table>
+</div>
 
-**Can I run multiple companies?**
-Yes. A single deployment can run an unlimited number of companies with complete data isolation.
+If it can receive a heartbeat, it works.
 
-**How is Crewdeck different from agents like OpenClaw or Claude Code?**
-Crewdeck _uses_ those agents. It orchestrates them into a company — with org charts, budgets, goals, governance, and accountability.
+## Architecture
 
-**Why should I use Crewdeck instead of just pointing my OpenClaw to Asana or Trello?**
-Agent orchestration has subtleties in how you coordinate who has work checked out, how to maintain sessions, monitoring costs, establishing governance - Crewdeck does this for you.
+Crewdeck is a **Node.js server + React dashboard** backed by embedded PostgreSQL. One process, one port, no external dependencies.
 
-(Bring-your-own-ticket-system is on the Roadmap)
-
-**Do agents run continuously?**
-By default, agents run on scheduled heartbeats and event-based triggers (task assignment, @-mentions). You can also hook in continuous agents like OpenClaw. You bring your agent and Crewdeck coordinates.
-
-<br/>
+- **Backend:** Node.js, Express, Drizzle ORM
+- **Frontend:** React, Vite
+- **Database:** Embedded PostgreSQL (or bring your own)
+- **Agents:** Communicate via heartbeat protocol over HTTP
 
 ## Development
 
@@ -227,54 +116,22 @@ pnpm db:generate      # Generate DB migration
 pnpm db:migrate       # Apply migrations
 ```
 
-See [doc/DEVELOPING.md](doc/DEVELOPING.md) for the full development guide.
+## FAQ
 
-<br/>
+**Is this like Paperclip?**
+Crewdeck is a fork of Paperclip, refocused for solo founders instead of enterprise teams.
 
-## Roadmap
+**Do I need to run this 24/7?**
+Run it on a home server, Raspberry Pi, or cheap VPS. Docker makes it easy. Your agents work while the server is up.
 
-- ⚪ Get OpenClaw onboarding easier
-- ⚪ Get cloud agents working e.g. Cursor / e2b agents
-- ⚪ ClipMart - buy and sell entire agent companies
-- ⚪ Easy agent configurations / easier to understand
-- ⚪ Better support for harness engineering
-- ⚪ Plugin system (e.g. if you want to add a knowledgebase, custom tracing, queues, etc)
-- ⚪ Better docs
+**How much does it cost?**
+Free and open source. You pay for the AI APIs your agents use.
 
-<br/>
-
-## Contributing
-
-We welcome contributions. See the [contributing guide](CONTRIBUTING.md) for details.
-
-<!-- TODO: add CONTRIBUTING.md -->
-
-<br/>
-
-## Community
-
-- [Discord](https://discord.gg/m4HZY7xNG3) — Join the community
-- [GitHub Issues](https://github.com/crewdeck/crewdeck/issues) — bugs and feature requests
-- [GitHub Discussions](https://github.com/crewdeck/crewdeck/discussions) — ideas and RFC
-
-<br/>
+**Can I run multiple projects?**
+Yes. One deployment handles as many projects as you need, with isolated data.
 
 ## License
 
-MIT &copy; 2026 Crewdeck
-
-## Star History
+MIT
 
 [![Star History Chart](https://api.star-history.com/image?repos=crewdeck/crewdeck&type=date&legend=top-left)](https://www.star-history.com/?repos=crewdeck%2Fcrewdeck&type=date&legend=top-left)
-
-<br/>
-
----
-
-<p align="center">
-  <img src="doc/assets/footer.jpg" alt="" width="720" />
-</p>
-
-<p align="center">
-  <sub>Open source under MIT. Built for people who want to run companies, not babysit agents.</sub>
-</p>
