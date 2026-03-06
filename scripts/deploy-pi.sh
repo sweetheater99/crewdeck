@@ -57,10 +57,13 @@ rsync -az --delete \
   --include='packages/' \
   --include='packages/*/' \
   --include='packages/*/dist/***' \
+  --include='packages/*/src/***' \
   --include='packages/*/package.json' \
+  --include='packages/*/tsconfig.json' \
   --include='packages/adapters/' \
   --include='packages/adapters/*/' \
   --include='packages/adapters/*/dist/***' \
+  --include='packages/adapters/*/src/***' \
   --include='packages/adapters/*/package.json' \
   --include='cli/' \
   --include='cli/package.json' \
@@ -76,7 +79,8 @@ fi
 # 4. Install dependencies on Pi
 # ----------------------------------------------------------
 info "Installing production dependencies on Pi..."
-ssh "$PI_HOST" "cd $PI_DIR && npm install -g pnpm@9 2>/dev/null || true && pnpm install --prod --frozen-lockfile"
+ssh "$PI_HOST" "sudo corepack enable && corepack prepare pnpm@9 --activate 2>/dev/null || sudo npm install -g pnpm@9"
+ssh "$PI_HOST" "cd $PI_DIR && pnpm install --prod --frozen-lockfile"
 
 # ----------------------------------------------------------
 # 5. Set up PostgreSQL database
