@@ -1,9 +1,9 @@
-import type { CLIAdapterModule } from "@paperclipai/adapter-utils";
-import { printClaudeStreamEvent } from "@paperclipai/adapter-claude-local/cli";
-import { printCodexStreamEvent } from "@paperclipai/adapter-codex-local/cli";
-import { printCursorStreamEvent } from "@paperclipai/adapter-cursor-local/cli";
-import { printOpenCodeStreamEvent } from "@paperclipai/adapter-opencode-local/cli";
-import { printOpenClawStreamEvent } from "@paperclipai/adapter-openclaw/cli";
+import type { CLIAdapterModule } from "@crewdeck/adapter-utils";
+import { printClaudeStreamEvent } from "@crewdeck/adapter-claude-local/cli";
+import { printCodexStreamEvent } from "@crewdeck/adapter-codex-local/cli";
+import { printCursorStreamEvent } from "@crewdeck/adapter-cursor-local/cli";
+import { printOpenCodeStreamEvent } from "@crewdeck/adapter-opencode-local/cli";
+import { printOpenClawStreamEvent } from "@crewdeck/adapter-openclaw/cli";
 import { processCLIAdapter } from "./process/index.js";
 import { httpCLIAdapter } from "./http/index.js";
 

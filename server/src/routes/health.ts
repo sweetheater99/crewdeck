@@ -1,8 +1,8 @@
 import { Router } from "express";
-import type { Db } from "@paperclipai/db";
+import type { Db } from "@crewdeck/db";
 import { count, sql } from "drizzle-orm";
-import { instanceUserRoles } from "@paperclipai/db";
-import type { DeploymentExposure, DeploymentMode } from "@paperclipai/shared";
+import { instanceUserRoles } from "@crewdeck/db";
+import type { DeploymentExposure, DeploymentMode } from "@crewdeck/shared";
 
 export function healthRoutes(
   db?: Db,

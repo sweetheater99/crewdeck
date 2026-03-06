@@ -1,9 +1,9 @@
 ---
 title: Local Development
-summary: Set up Paperclip for local development
+summary: Set up Crewdeck for local development
 ---
 
-Run Paperclip locally with zero external dependencies.
+Run Crewdeck locally with zero external dependencies.
 
 ## Prerequisites
 
@@ -22,20 +22,20 @@ This starts:
 - **API server** at `http://localhost:3100`
 - **UI** served by the API server in dev middleware mode (same origin)
 
-No Docker or external database required. Paperclip uses embedded PostgreSQL automatically.
+No Docker or external database required. Crewdeck uses embedded PostgreSQL automatically.
 
 ## One-Command Bootstrap
 
 For a first-time install:
 
 ```sh
-pnpm paperclipai run
+pnpm crewdeck run
 ```
 
 This does:
 
 1. Auto-onboards if config is missing
-2. Runs `paperclipai doctor` with repair enabled
+2. Runs `crewdeck doctor` with repair enabled
 3. Starts the server when checks pass
 
 ## Tailscale/Private Auth Dev Mode
@@ -51,7 +51,7 @@ This binds the server to `0.0.0.0` for private-network access.
 Allow additional private hostnames:
 
 ```sh
-pnpm paperclipai allowed-hostname dotta-macbook-pro
+pnpm crewdeck allowed-hostname dotta-macbook-pro
 ```
 
 ## Health Checks
@@ -69,7 +69,7 @@ curl http://localhost:3100/api/companies
 To wipe local data and start fresh:
 
 ```sh
-rm -rf ~/.paperclip/instances/default/db
+rm -rf ~/.crewdeck/instances/default/db
 pnpm dev
 ```
 
@@ -77,14 +77,14 @@ pnpm dev
 
 | Data | Path |
 |------|------|
-| Config | `~/.paperclip/instances/default/config.json` |
-| Database | `~/.paperclip/instances/default/db` |
-| Storage | `~/.paperclip/instances/default/data/storage` |
-| Secrets key | `~/.paperclip/instances/default/secrets/master.key` |
-| Logs | `~/.paperclip/instances/default/logs` |
+| Config | `~/.crewdeck/instances/default/config.json` |
+| Database | `~/.crewdeck/instances/default/db` |
+| Storage | `~/.crewdeck/instances/default/data/storage` |
+| Secrets key | `~/.crewdeck/instances/default/secrets/master.key` |
+| Logs | `~/.crewdeck/instances/default/logs` |
 
 Override with environment variables:
 
 ```sh
-PAPERCLIP_HOME=/custom/path PAPERCLIP_INSTANCE_ID=dev pnpm paperclipai run
+CREWDECK_HOME=/custom/path CREWDECK_INSTANCE_ID=dev pnpm crewdeck run
 ```

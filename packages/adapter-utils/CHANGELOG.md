@@ -1,4 +1,4 @@
-# @paperclipai/adapter-utils
+# @crewdeck/adapter-utils
 
 ## 0.2.7
 

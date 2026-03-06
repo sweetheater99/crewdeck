@@ -1,13 +1,13 @@
 {
-  "name": "paperclipai",
+  "name": "crewdeck",
   "version": "0.2.7",
-  "description": "Paperclip CLI — orchestrate AI agent teams to run a business",
+  "description": "Crewdeck CLI — orchestrate AI agent teams to run a business",
   "type": "module",
   "bin": {
-    "paperclipai": "./dist/index.js"
+    "crewdeck": "./dist/index.js"
   },
   "keywords": [
-    "paperclip",
+    "crewdeck",
     "ai",
     "agents",
     "orchestration",
@@ -34,15 +34,15 @@
   },
   "dependencies": {
     "@clack/prompts": "^0.10.0",
-    "@paperclipai/adapter-claude-local": "workspace:*",
-    "@paperclipai/adapter-codex-local": "workspace:*",
-    "@paperclipai/adapter-cursor-local": "workspace:*",
-    "@paperclipai/adapter-opencode-local": "workspace:*",
-    "@paperclipai/adapter-openclaw": "workspace:*",
-    "@paperclipai/adapter-utils": "workspace:*",
-    "@paperclipai/db": "workspace:*",
-    "@paperclipai/server": "workspace:*",
-    "@paperclipai/shared": "workspace:*",
+    "@crewdeck/adapter-claude-local": "workspace:*",
+    "@crewdeck/adapter-codex-local": "workspace:*",
+    "@crewdeck/adapter-cursor-local": "workspace:*",
+    "@crewdeck/adapter-opencode-local": "workspace:*",
+    "@crewdeck/adapter-openclaw": "workspace:*",
+    "@crewdeck/adapter-utils": "workspace:*",
+    "@crewdeck/db": "workspace:*",
+    "@crewdeck/server": "workspace:*",
+    "@crewdeck/shared": "workspace:*",
     "drizzle-orm": "0.38.4",
     "dotenv": "^17.0.1",
     "commander": "^13.1.0",

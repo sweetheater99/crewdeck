@@ -1,6 +1,6 @@
 import { Router } from "express";
-import type { Db } from "@paperclipai/db";
-import { createCostEventSchema, updateBudgetSchema } from "@paperclipai/shared";
+import type { Db } from "@crewdeck/db";
+import { createCostEventSchema, updateBudgetSchema } from "@crewdeck/shared";
 import { validate } from "../middleware/validate.js";
 import { costService, companyService, agentService, logActivity } from "../services/index.js";
 import { assertBoard, assertCompanyAccess, getActorInfo } from "./authz.js";

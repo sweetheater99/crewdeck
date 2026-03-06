@@ -7,8 +7,8 @@ import type {
   HeartbeatRun,
   Approval,
   AgentConfigRevision,
-} from "@paperclipai/shared";
-import { isUuidLike, normalizeAgentUrlKey } from "@paperclipai/shared";
+} from "@crewdeck/shared";
+import { isUuidLike, normalizeAgentUrlKey } from "@crewdeck/shared";
 import { ApiError, api } from "./client";
 
 export interface AgentKey {

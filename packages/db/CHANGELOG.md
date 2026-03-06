@@ -1,4 +1,4 @@
-# @paperclipai/db
+# @crewdeck/db
 
 ## 0.2.7
 
@@ -6,7 +6,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.7
+  - @crewdeck/shared@0.2.7
 
 ## 0.2.6
 
@@ -14,7 +14,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.6
+  - @crewdeck/shared@0.2.6
 
 ## 0.2.5
 
@@ -22,7 +22,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.5
+  - @crewdeck/shared@0.2.5
 
 ## 0.2.4
 
@@ -30,7 +30,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.4
+  - @crewdeck/shared@0.2.4
 
 ## 0.2.3
 
@@ -38,7 +38,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.3
+  - @crewdeck/shared@0.2.3
 
 ## 0.2.2
 
@@ -46,7 +46,7 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.2
+  - @crewdeck/shared@0.2.2
 
 ## 0.2.1
 
@@ -54,4 +54,4 @@
 
 - Version bump (patch)
 - Updated dependencies
-  - @paperclipai/shared@0.2.1
+  - @crewdeck/shared@0.2.1

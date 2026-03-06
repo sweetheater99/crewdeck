@@ -1,6 +1,6 @@
 .git
 .github
-.paperclip
+.crewdeck
 .pnpm-store
 node_modules
 **/node_modules

@@ -3,13 +3,13 @@ import type { IncomingHttpHeaders } from "node:http";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { toNodeHandler } from "better-auth/node";
-import type { Db } from "@paperclipai/db";
+import type { Db } from "@crewdeck/db";
 import {
   authAccounts,
   authSessions,
   authUsers,
   authVerifications,
-} from "@paperclipai/db";
+} from "@crewdeck/db";
 import type { Config } from "../config.js";
 
 export type BetterAuthSessionUser = {
@@ -44,7 +44,7 @@ function headersFromExpressRequest(req: Request): Headers {
 
 export function createBetterAuthInstance(db: Db, config: Config): BetterAuthInstance {
   const baseUrl = config.authBaseUrlMode === "explicit" ? config.authPublicBaseUrl : undefined;
-  const secret = process.env.BETTER_AUTH_SECRET ?? process.env.PAPERCLIP_AGENT_JWT_SECRET ?? "paperclip-dev-secret";
+  const secret = process.env.BETTER_AUTH_SECRET ?? process.env.CREWDECK_AGENT_JWT_SECRET ?? "crewdeck-dev-secret";
 
   const authConfig = {
     baseURL: baseUrl,

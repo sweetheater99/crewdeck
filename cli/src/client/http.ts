@@ -23,7 +23,7 @@ interface ApiClientOptions {
   runId?: string;
 }
 
-export class PaperclipApiClient {
+export class CrewdeckApiClient {
   readonly apiBase: string;
   readonly apiKey?: string;
   readonly runId?: string;
@@ -73,7 +73,7 @@ export class PaperclipApiClient {
     }
 
     if (this.runId) {
-      headers["x-paperclip-run-id"] = this.runId;
+      headers["x-crewdeck-run-id"] = this.runId;
     }
 
     const response = await fetch(url, {

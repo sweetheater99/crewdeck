@@ -1,5 +1,5 @@
-import type { AdapterExecutionContext, AdapterExecutionResult } from "@paperclipai/adapter-utils";
-import { asNumber, asString, parseObject } from "@paperclipai/adapter-utils/server-utils";
+import type { AdapterExecutionContext, AdapterExecutionResult } from "@crewdeck/adapter-utils";
+import { asNumber, asString, parseObject } from "@crewdeck/adapter-utils/server-utils";
 import { parseOpenClawResponse } from "./parse.js";
 
 function nonEmpty(value: unknown): string | null {
@@ -54,7 +54,7 @@ export async function execute(ctx: AdapterExecutionContext): Promise<AdapterExec
 
   const body = {
     ...payloadTemplate,
-    paperclip: {
+    crewdeck: {
       ...wakePayload,
       context,
     },
