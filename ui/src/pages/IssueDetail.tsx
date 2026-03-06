@@ -43,7 +43,7 @@ import {
   Mail,
   MessageSquare,
   MoreHorizontal,
-  Crewdeck,
+  Ship,
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
@@ -713,7 +713,7 @@ export function IssueDetail() {
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadAttachment.isPending}
             >
-              <Crewdeck className="h-3.5 w-3.5 mr-1.5" />
+              <Ship className="h-3.5 w-3.5 mr-1.5" />
               {uploadAttachment.isPending ? "Uploading..." : "Upload image"}
             </Button>
           </div>

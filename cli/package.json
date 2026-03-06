@@ -39,6 +39,7 @@
     "@crewdeck/adapter-cursor-local": "workspace:*",
     "@crewdeck/adapter-opencode-local": "workspace:*",
     "@crewdeck/adapter-openclaw": "workspace:*",
+    "@crewdeck/adapter-status-monitor": "workspace:*",
     "@crewdeck/adapter-utils": "workspace:*",
     "@crewdeck/db": "workspace:*",
     "@crewdeck/server": "workspace:*",

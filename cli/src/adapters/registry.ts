@@ -4,6 +4,7 @@ import { printCodexStreamEvent } from "@crewdeck/adapter-codex-local/cli";
 import { printCursorStreamEvent } from "@crewdeck/adapter-cursor-local/cli";
 import { printOpenCodeStreamEvent } from "@crewdeck/adapter-opencode-local/cli";
 import { printOpenClawStreamEvent } from "@crewdeck/adapter-openclaw/cli";
+import { printStatusMonitorEvent } from "@crewdeck/adapter-status-monitor/cli";
 import { processCLIAdapter } from "./process/index.js";
 import { httpCLIAdapter } from "./http/index.js";
 
@@ -32,8 +33,13 @@ const openclawCLIAdapter: CLIAdapterModule = {
   formatStdoutEvent: printOpenClawStreamEvent,
 };
 
+const statusMonitorCLIAdapter: CLIAdapterModule = {
+  type: "status_monitor",
+  formatStdoutEvent: printStatusMonitorEvent,
+};
+
 const adaptersByType = new Map<string, CLIAdapterModule>(
-  [claudeLocalCLIAdapter, codexLocalCLIAdapter, opencodeLocalCLIAdapter, cursorLocalCLIAdapter, openclawCLIAdapter, processCLIAdapter, httpCLIAdapter].map((a) => [a.type, a]),
+  [claudeLocalCLIAdapter, codexLocalCLIAdapter, opencodeLocalCLIAdapter, cursorLocalCLIAdapter, openclawCLIAdapter, statusMonitorCLIAdapter, processCLIAdapter, httpCLIAdapter].map((a) => [a.type, a]),
 );
 
 export function getCLIAdapter(type: string): CLIAdapterModule {

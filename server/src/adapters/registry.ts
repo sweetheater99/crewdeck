@@ -31,6 +31,13 @@ import {
   agentConfigurationDoc as openclawAgentConfigurationDoc,
   models as openclawModels,
 } from "@crewdeck/adapter-openclaw";
+import {
+  execute as statusMonitorExecute,
+  testEnvironment as statusMonitorTestEnvironment,
+} from "@crewdeck/adapter-status-monitor/server";
+import {
+  agentConfigurationDoc as statusMonitorAgentConfigurationDoc,
+} from "@crewdeck/adapter-status-monitor";
 import { listCodexModels } from "./codex-models.js";
 import { listCursorModels } from "./cursor-models.js";
 import { processAdapter } from "./process/index.js";
@@ -87,8 +94,17 @@ const openclawAdapter: ServerAdapterModule = {
   agentConfigurationDoc: openclawAgentConfigurationDoc,
 };
 
+const statusMonitorAdapter: ServerAdapterModule = {
+  type: "status_monitor",
+  execute: statusMonitorExecute,
+  testEnvironment: statusMonitorTestEnvironment,
+  models: [],
+  supportsLocalAgentJwt: false,
+  agentConfigurationDoc: statusMonitorAgentConfigurationDoc,
+};
+
 const adaptersByType = new Map<string, ServerAdapterModule>(
-  [claudeLocalAdapter, codexLocalAdapter, opencodeLocalAdapter, cursorLocalAdapter, openclawAdapter, processAdapter, httpAdapter].map((a) => [a.type, a]),
+  [claudeLocalAdapter, codexLocalAdapter, opencodeLocalAdapter, cursorLocalAdapter, openclawAdapter, statusMonitorAdapter, processAdapter, httpAdapter].map((a) => [a.type, a]),
 );
 
 export function getServerAdapter(type: string): ServerAdapterModule {

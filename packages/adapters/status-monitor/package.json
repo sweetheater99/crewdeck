@@ -1,5 +1,5 @@
 {
-  "name": "@crewdeck/adapter-opencode-local",
+  "name": "@crewdeck/adapter-status-monitor",
   "version": "0.2.7",
   "type": "module",
   "exports": {
@@ -32,8 +32,7 @@
     "types": "./dist/index.d.ts"
   },
   "files": [
-    "dist",
-    "skills"
+    "dist"
   ],
   "scripts": {
     "build": "tsc",

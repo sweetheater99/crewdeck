@@ -33,7 +33,7 @@ import {
   AlertTriangle,
   Tag,
   Calendar,
-  Crewdeck,
+  Ship,
 } from "lucide-react";
 import { cn } from "../lib/utils";
 import { issueStatusText, issueStatusTextDefault, priorityColor, priorityColorDefault } from "../lib/status-colors";
@@ -884,7 +884,7 @@ export function NewIssueDialog() {
             onClick={() => attachInputRef.current?.click()}
             disabled={uploadDescriptionImage.isPending}
           >
-            <Crewdeck className="h-3 w-3" />
+            <Ship className="h-3 w-3" />
             {uploadDescriptionImage.isPending ? "Uploading..." : "Image"}
           </button>
 

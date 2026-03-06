@@ -37,7 +37,7 @@ export const help: Record<string, string> = {
   localCommand: "Override the path to the CLI command you want the adapter to call (e.g. /usr/local/bin/claude, codex).",
   args: "Command-line arguments, comma-separated.",
   extraArgs: "Extra CLI arguments for local adapters, comma-separated.",
-  envVars: "Environment variables injected into the adapter process. Use plain values or secret references.",
+  envVars: "Environment variables injected into the adapter process. For Claude Code: OAuth login is recommended (no env vars needed). Only set ANTHROPIC_API_KEY here if you prefer pay-per-use API billing.",
   webhookUrl: "The URL that receives POST requests when the agent is invoked.",
   heartbeatInterval: "Run this agent automatically on a timer. Useful for periodic tasks like checking for new work.",
   intervalSec: "Seconds between automatic heartbeat invocations.",
@@ -59,6 +59,7 @@ export const adapterLabels: Record<string, string> = {
   opencode_local: "OpenCode (local)",
   openclaw: "OpenClaw",
   cursor: "Cursor (local)",
+  status_monitor: "Status Monitor",
   process: "Process",
   http: "HTTP",
 };
