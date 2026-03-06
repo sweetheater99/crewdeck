@@ -2,6 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import type { Db } from "@crewdeck/db";
 import { issueDependencies, issues } from "@crewdeck/db";
 import { unprocessable, notFound } from "../errors.js";
+import { notificationService } from "./notifications.js";
 
 const DONE_STATUSES = new Set(["done", "cancelled"]);
 
@@ -11,6 +12,8 @@ export interface DependencyServiceOptions {
 }
 
 export function dependencyService(db: Db, opts: DependencyServiceOptions = {}) {
+  const notifSvc = notificationService(db);
+
   async function recalculateBlockedStatus(companyId: string, issueId: string) {
     // Fetch the issue
     const issue = await db
@@ -18,6 +21,8 @@ export function dependencyService(db: Db, opts: DependencyServiceOptions = {}) {
         id: issues.id,
         status: issues.status,
         assigneeAgentId: issues.assigneeAgentId,
+        identifier: issues.identifier,
+        title: issues.title,
       })
       .from(issues)
       .where(and(eq(issues.id, issueId), eq(issues.companyId, companyId)))
@@ -58,6 +63,12 @@ export function dependencyService(db: Db, opts: DependencyServiceOptions = {}) {
         .update(issues)
         .set({ status: nextStatus, updatedAt: new Date() })
         .where(eq(issues.id, issueId));
+
+      // Notify: task.unblocked
+      notifSvc.emit(companyId, "task.unblocked", {
+        issueIdentifier: issue.identifier,
+        issueTitle: issue.title,
+      }).catch(() => {});
 
       // Auto-wake the assigned agent now that this issue is unblocked
       if (issue.assigneeAgentId && opts.onUnblocked) {

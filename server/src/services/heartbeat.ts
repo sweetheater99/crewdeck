@@ -23,6 +23,7 @@ import type { AdapterExecutionResult, AdapterInvocationMeta, AdapterSessionCodec
 import { createLocalAgentJwt } from "../agent-auth-jwt.js";
 import { parseObject, asBoolean, asNumber, appendWithCap, MAX_EXCERPT_BYTES } from "../adapters/utils.js";
 import { secretService } from "./secrets.js";
+import { notificationService } from "./notifications.js";
 import { resolveDefaultAgentWorkspaceDir } from "../home-paths.js";
 
 const MAX_LIVE_LOG_CHUNK_BYTES = 8 * 1024;
@@ -428,6 +429,15 @@ function resolveNextSessionState(input: {
 export function heartbeatService(db: Db) {
   const runLogStore = getRunLogStore();
   const secretsSvc = secretService(db);
+  const notifSvc = notificationService(db);
+
+  async function getIssueMeta(issueId: string) {
+    return db
+      .select({ identifier: issues.identifier, title: issues.title })
+      .from(issues)
+      .where(eq(issues.id, issueId))
+      .then((rows) => rows[0] ?? null);
+  }
 
   async function getAgent(agentId: string) {
     return db
@@ -1422,6 +1432,16 @@ export function heartbeatService(db: Db) {
           .set({ reviewStatus: "pending_review", updatedAt: new Date() })
           .where(eq(issues.id, issueId));
         logger.info({ agentId: agent.id, issueId }, "Task pending review");
+
+        // Notify: agent.review_pending
+        const issueMeta = await getIssueMeta(issueId);
+        if (issueMeta) {
+          notifSvc.emit(agent.companyId, "agent.review_pending", {
+            issueIdentifier: issueMeta.identifier,
+            issueTitle: issueMeta.title,
+            agentName: agent.name,
+          }).catch(() => {});
+        }
       }
 
       // --- Failure escalation / success reset ---
@@ -1431,7 +1451,38 @@ export function heartbeatService(db: Db) {
             .set({ consecutiveFailures: 0, updatedAt: new Date() })
             .where(eq(agents.id, agent.id));
         }
+
+        // Notify: task.completed (only if not review-gated)
+        if (issueId && !agent.requiresReview) {
+          const issueMeta = await getIssueMeta(issueId);
+          if (issueMeta) {
+            const costCents = adapterResult.costUsd != null ? Math.round(adapterResult.costUsd * 100) : undefined;
+            notifSvc.emit(agent.companyId, "task.completed", {
+              issueIdentifier: issueMeta.identifier,
+              issueTitle: issueMeta.title,
+              agentName: agent.name,
+              costCents: costCents ?? 0,
+            }).catch(() => {});
+          }
+        }
       } else if (outcome === "failed") {
+        // Notify: task.failed
+        if (issueId) {
+          const issueMeta = await getIssueMeta(issueId);
+          const retryPolicy = agent.retryPolicy as { maxRetries: number; backoffSec: number } | null;
+          const maxRetries = retryPolicy?.maxRetries ?? 3;
+          if (issueMeta) {
+            notifSvc.emit(agent.companyId, "task.failed", {
+              issueIdentifier: issueMeta.identifier,
+              issueTitle: issueMeta.title,
+              agentName: agent.name,
+              error: adapterResult.errorMessage ?? "Adapter failed",
+              attempt: agent.consecutiveFailures + 1,
+              maxRetries,
+            }).catch(() => {});
+          }
+        }
+
         await handleFailureEscalation(agent.id, agent.companyId, issueId ?? null);
       }
     } catch (err) {
@@ -1495,6 +1546,23 @@ export function heartbeatService(db: Db) {
       }
 
       await finalizeAgentStatus(agent.id, "failed");
+
+      // Notify: task.failed (catch path)
+      if (issueId) {
+        const issueMeta = await getIssueMeta(issueId).catch(() => null);
+        const retryPolicy = agent.retryPolicy as { maxRetries: number; backoffSec: number } | null;
+        const maxRetries = retryPolicy?.maxRetries ?? 3;
+        if (issueMeta) {
+          notifSvc.emit(agent.companyId, "task.failed", {
+            issueIdentifier: issueMeta.identifier,
+            issueTitle: issueMeta.title,
+            agentName: agent.name,
+            error: message,
+            attempt: agent.consecutiveFailures + 1,
+            maxRetries,
+          }).catch(() => {});
+        }
+      }
 
       // --- Failure escalation (catch path) ---
       await handleFailureEscalation(agent.id, agent.companyId, issueId ?? null);
@@ -1585,6 +1653,14 @@ export function heartbeatService(db: Db) {
               body: `⚠️ Escalation: Agent failed ${updatedAgent.consecutiveFailures} consecutive times. All retries exhausted and no fallback agent configured. This issue needs manual attention.`,
             });
           }
+
+          // Notify: agent.escalation
+          notifSvc.emit(companyId, "agent.escalation", {
+            agentName: updatedAgent.name,
+            issueIdentifier: issueId ?? "unknown",
+            reason: `Failed ${updatedAgent.consecutiveFailures} consecutive times. All retries exhausted, no fallback agent.`,
+          }).catch(() => {});
+
           break;
         }
       }
@@ -1613,6 +1689,12 @@ export function heartbeatService(db: Db) {
           type: "agent.status",
           payload: { agentId, status: "paused", reason: "circuit_breaker" },
         });
+
+        // Notify: agent.circuit_breaker
+        notifSvc.emit(companyId, "agent.circuit_breaker", {
+          agentName: updatedAgent.name,
+          failedTaskCount,
+        }).catch(() => {});
       }
     } catch (escalationErr) {
       // Escalation logic should never break the main flow

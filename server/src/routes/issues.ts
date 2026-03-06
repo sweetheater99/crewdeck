@@ -24,6 +24,7 @@ import {
   issueApprovalService,
   issueService,
   logActivity,
+  notificationService,
   projectService,
 } from "../services/index.js";
 import { logger } from "../middleware/logger.js";
@@ -48,6 +49,7 @@ export function issueRoutes(db: Db, storage: StorageService) {
   const projectsSvc = projectService(db);
   const goalsSvc = goalService(db);
   const issueApprovalsSvc = issueApprovalService(db);
+  const notifSvc = notificationService(db);
   const depsSvc = dependencyService(db, {
     onUnblocked: (companyId, issueId, agentId) => {
       void heartbeat
@@ -1249,6 +1251,17 @@ export function issueRoutes(db: Db, storage: StorageService) {
       void depsSvc
         .onIssueCompleted(companyId, issueId)
         .catch((err) => logger.warn({ err, issueId }, "failed to recalculate dependents on review approval"));
+
+      // Notify: task.completed (review approved)
+      const agentName = issue.assigneeAgentId
+        ? await agentsSvc.getById(issue.assigneeAgentId).then((a) => a?.name ?? "Unknown").catch(() => "Unknown")
+        : "Unknown";
+      notifSvc.emit(companyId, "task.completed", {
+        issueIdentifier: issue.identifier,
+        issueTitle: issue.title,
+        agentName,
+        costCents: 0,
+      }).catch(() => {});
 
       res.json(updated);
     } else {

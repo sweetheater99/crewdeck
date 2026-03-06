@@ -2,6 +2,7 @@ import { and, desc, eq, gte, isNotNull, lte, sql } from "drizzle-orm";
 import type { Db } from "@crewdeck/db";
 import { activityLog, agents, companies, costEvents, heartbeatRuns, issues, projects } from "@crewdeck/db";
 import { notFound, unprocessable } from "../errors.js";
+import { notificationService } from "./notifications.js";
 
 export interface CostDateRange {
   from?: Date;
@@ -9,6 +10,8 @@ export interface CostDateRange {
 }
 
 export function costService(db: Db) {
+  const notifSvc = notificationService(db);
+
   return {
     createEvent: async (companyId: string, data: Omit<typeof costEvents.$inferInsert, "companyId">) => {
       const agent = await db
@@ -61,6 +64,28 @@ export function costService(db: Db) {
           .update(agents)
           .set({ status: "paused", updatedAt: new Date() })
           .where(eq(agents.id, updatedAgent.id));
+      }
+
+      // Budget notifications
+      if (updatedAgent && updatedAgent.budgetMonthlyCents > 0) {
+        const percentUsed = Math.round(
+          (updatedAgent.spentMonthlyCents / updatedAgent.budgetMonthlyCents) * 100,
+        );
+
+        if (updatedAgent.spentMonthlyCents >= updatedAgent.budgetMonthlyCents) {
+          notifSvc.emit(companyId, "agent.budget_exceeded", {
+            agentName: updatedAgent.name,
+            spentCents: updatedAgent.spentMonthlyCents,
+            budgetCents: updatedAgent.budgetMonthlyCents,
+          }).catch(() => {});
+        } else if (percentUsed >= 80) {
+          notifSvc.emit(companyId, "agent.budget_warning", {
+            agentName: updatedAgent.name,
+            percentUsed,
+            spentCents: updatedAgent.spentMonthlyCents,
+            budgetCents: updatedAgent.budgetMonthlyCents,
+          }).catch(() => {});
+        }
       }
 
       return event;
