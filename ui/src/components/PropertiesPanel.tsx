@@ -1,13 +1,38 @@
 import { X } from "lucide-react";
 import { usePanel } from "../context/PanelContext";
+import { useSidebar } from "../context/SidebarContext";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export function PropertiesPanel() {
   const { panelContent, panelVisible, setPanelVisible } = usePanel();
+  const { isMobile } = useSidebar();
 
   if (!panelContent) return null;
 
+  /* Mobile: full-screen bottom sheet */
+  if (isMobile) {
+    return (
+      <Sheet open={panelVisible} onOpenChange={setPanelVisible}>
+        <SheetContent side="bottom" className="h-[85dvh] rounded-t-xl p-0">
+          <SheetHeader className="px-4 pt-4 pb-2 border-b border-border">
+            <SheetTitle className="text-sm">Properties</SheetTitle>
+          </SheetHeader>
+          <ScrollArea className="flex-1 h-[calc(85dvh-3.5rem)]">
+            <div className="p-4">{panelContent}</div>
+          </ScrollArea>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  /* Desktop: inline side panel */
   return (
     <aside
       className="hidden md:flex border-l border-border bg-card flex-col shrink-0 overflow-hidden transition-[width,opacity] duration-200 ease-in-out"

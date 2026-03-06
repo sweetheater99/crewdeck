@@ -122,7 +122,7 @@ export function ReviewQueue() {
                 key={issue.id}
                 className="rounded-lg border border-border bg-card p-4 space-y-3"
               >
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
                   <StatusIcon status={issue.status} />
                   <PriorityIcon priority={issue.priority} />
                   <span className="text-xs font-mono text-muted-foreground shrink-0">
@@ -130,7 +130,7 @@ export function ReviewQueue() {
                   </span>
                   <Link
                     to={`/issues/${issue.identifier ?? issue.id}`}
-                    className="text-sm font-medium hover:underline truncate"
+                    className="text-sm font-medium hover:underline truncate min-w-0 flex-1 basis-[120px]"
                   >
                     {issue.title}
                   </Link>
@@ -147,10 +147,11 @@ export function ReviewQueue() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     variant="default"
                     size="sm"
+                    className="min-h-[44px] sm:min-h-0"
                     onClick={() => approveMutation.mutate(issue.id)}
                     disabled={approveMutation.isPending || rejectMutation.isPending}
                   >
@@ -158,10 +159,10 @@ export function ReviewQueue() {
                     Approve
                   </Button>
                   {isRejecting ? (
-                    <div className="flex items-center gap-2 flex-1">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 flex-1 min-w-0">
                       <input
                         type="text"
-                        className="flex-1 rounded-md border border-border bg-background px-2 py-1 text-sm"
+                        className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm min-h-[44px] sm:min-h-0 w-full"
                         placeholder="Rejection feedback..."
                         value={feedback}
                         onChange={(e) => setFeedback(e.target.value)}
@@ -176,31 +177,36 @@ export function ReviewQueue() {
                           }
                         }}
                       />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() =>
-                          rejectMutation.mutate({ issueId: issue.id, feedback: feedback || undefined })
-                        }
-                        disabled={rejectMutation.isPending}
-                      >
-                        Reject
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setRejectingId(null);
-                          setFeedback("");
-                        }}
-                      >
-                        Cancel
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="min-h-[44px] sm:min-h-0 flex-1 sm:flex-none"
+                          onClick={() =>
+                            rejectMutation.mutate({ issueId: issue.id, feedback: feedback || undefined })
+                          }
+                          disabled={rejectMutation.isPending}
+                        >
+                          Reject
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-[44px] sm:min-h-0 flex-1 sm:flex-none"
+                          onClick={() => {
+                            setRejectingId(null);
+                            setFeedback("");
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <Button
                       variant="outline"
                       size="sm"
+                      className="min-h-[44px] sm:min-h-0"
                       onClick={() => {
                         setRejectingId(issue.id);
                         setFeedback("");

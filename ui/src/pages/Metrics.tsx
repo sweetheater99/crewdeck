@@ -134,7 +134,7 @@ export function Metrics() {
     <div className="space-y-6">
       {/* Overview Cards */}
       {overview && (
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-1 sm:gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-1 sm:gap-2">
           <MetricCard
             icon={DollarSign}
             value={formatCents(overview.totalSpendCents)}
@@ -257,7 +257,7 @@ export function Metrics() {
       </Card>
 
       {/* Trend Charts */}
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         <span className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
           Trends
         </span>
@@ -280,7 +280,7 @@ export function Metrics() {
       </div>
 
       {trends && (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <SpendChart daily={trends.daily} />
           <ThroughputChart daily={trends.daily} />
         </div>

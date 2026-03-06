@@ -71,7 +71,7 @@ export function MobileBottomNav({ visible }: MobileBottomNavProps) {
       )}
       aria-label="Mobile navigation"
     >
-      <div className="grid h-16 grid-cols-5 px-1">
+      <div className="grid h-16 grid-cols-5 px-1 gap-0.5">
         {items.map((item) => {
           if (item.type === "action") {
             const Icon = item.icon;
